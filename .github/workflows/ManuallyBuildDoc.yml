@@ -1,0 +1,26 @@
+name: ManuallyBuildDoc
+
+on: [push, pull_request, workflow_dispatch]
+
+# 64-bit Julia only
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[doc]')"
+    steps:
+      - uses: actions/checkout@v1
+      - uses: julia-actions/setup-julia@latest
+        with:
+          version: '1.6.4'
+      - run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+      - run: julia --project=docs -e '
+          using Pkg;
+          Pkg.add("Documenter");
+          Pkg.develop(PackageSpec(; path=pwd()));
+          Pkg.instantiate();'
+      - name: Build and deploy doc
+        env:
+          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Deploying to else where, so use SSH instead
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+        run: >
+          DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=docs --color=yes docs/make.jl

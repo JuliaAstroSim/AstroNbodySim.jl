@@ -1,0 +1,7 @@
+[deps]
+AstroIC = "5b3ca070-48c3-41ea-b469-89825dd01fde"
+AstroIO = "c85a633c-0c3f-44a2-bffe-7f9d0681b3e7"
+AstroPlot = "00b67d96-df8a-4e04-ab4d-0170e12eeaec"
+PhysicalMeshes = "97d9904f-034f-4fb7-aeaa-03a173434233"
+PhysicalParticles = "78724250-4eb2-11e9-0f34-13a7aab864c5"
+PhysicalTrees = "dc5d4990-50a5-4af2-bdaa-6f78dc9b9fb2"

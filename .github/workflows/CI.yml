@@ -1,0 +1,43 @@
+name: CI
+
+on: [push, pull_request, workflow_dispatch]
+
+# 64-bit Julia only
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'CompatHelper')"
+    strategy:
+      matrix:
+        version:
+          - '1.6.4'
+        os:
+          - ubuntu-latest
+          #- macOS-latest
+          #- windows-latest
+        arch:
+          - x64
+    steps:
+      - run: echo ACTIONS_RUNNER_DEBUG true
+      - uses: actions/checkout@v1.0.0
+      - name: "Set up Julia"
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      #- uses: julia-actions/julia-buildpkg@latest
+      - run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+      - name: Install Julia dependencies
+        shell: julia --project=monorepo {0}
+        run: |
+          using Pkg;
+          # dev mono repo versions
+          pkg"dev ."
+      - name: Run the tests
+        continue-on-error: true
+        run: >
+          DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=monorepo -e 'using Pkg; Pkg.test("AstroNbodySim", coverage=true)'
+      - uses: julia-actions/julia-uploadcodecov@latest
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
