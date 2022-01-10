@@ -1,14 +1,12 @@
-# In this example, we simulate a Plummer star cluster around black hole using pseudo-Newtonian potential
+# 07 Tidal Disruption Event (TDE) of Star Cluster
 
-@info "Loading"
+In this example, we demonstrate how to:
+- Define custom procedures to be executed in each time-step
+- Remove accreted particles on the run
+- Write and visualize accretion history
+- Estimate properties of the black hole
 
-
-#=
-cd("AstroNbodySim.jl/examples/23-TDE-StarCluster")
-push!(ARGS, "deeptest")
-include("23-TDE-StarCluster.jl")
-=#
-
+```julia
 
 using AstroNbodySim, PhysicalParticles
 using Unitful, UnitfulAstro
@@ -136,11 +134,8 @@ axis = layout[1,1] = GLMakie.Axis(scene,
 )
 GLMakie.lines!(axis, df.time, N)
 Makie.save("output/TDE-elliptic-AccretionHistory.png", scene)
+```
 
+![TDE position slice mosaic view](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png "TDE position slice mosaic view")
 
-# write success flag for shell
-success = open("output/success", "w")
-close(success)
-
-# Clear memory
-AstroNbodySim.clear()
+![TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png "TDE accretion history")

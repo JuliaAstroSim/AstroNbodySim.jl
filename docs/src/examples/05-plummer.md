@@ -1,10 +1,11 @@
-# In this example, we generate and simulate a plummer cluster
-@info "Loading example 03-plummer"
+# 05 Plummer Star Cluster
 
-#=
-cd("AstroNbodySim.jl/examples/03-plummer")
-=#
+In this example, we demonstrate how to:
+- Simulate using DS gravity solver and Tree solver, both with adaptive and constant time-step
+- Generate a Plummer star cluster using `AstroIC`
+- Plot Lagrangian radii and scale radius
 
+```julia
 using AstroNbodySim, PhysicalParticles, Unitful, UnitfulAstro
 astro()
 mkpathIfNotExist("output")
@@ -114,17 +115,6 @@ function plotfigs(ds, ds_adapt, ts, ts_adapt)
     plot_radii!(AS4, LagrangeScene, AL4, LagrangeLayout, ts_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
     mv("radii.csv", "output/Plummer-TreeAdaptive-radii.csv", force = true)
 
-    #LagrangeLayout[:,3] = GLMakie.Legend(
-    #    LagrangeScene,
-    #    LagrangeScene.children[1].plots[2:end],
-    #    ["10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%"];
-    #    tellheight = false,
-    #    tellwidth = false,
-    #    halign = :left,
-    #    valign = :center,
-    #    margin = (0,0,0,0),
-    #)
-
     colsize!(LagrangeLayout, 1, Relative(0.47))
     colsize!(LagrangeLayout, 2, Relative(0.47))
     rowsize!(LagrangeLayout, 1, Relative(0.5))
@@ -135,34 +125,11 @@ function plotfigs(ds, ds_adapt, ts, ts_adapt)
 
     supertitle = LagrangeLayout[0,:] = Label(LagrangeScene, "Lagrange Radii")
     Makie.save("output/Plummer-LagrangianRadii.png", LagrangeScene)
-    
-
-    #@info "Plotting positions"
-    #plot_positionslice(ds.config.output.dir,       "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
-    #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-    #plot_positionslice(ds_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
-    #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-    #plot_positionslice(ts.config.output.dir,       "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
-    #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-    #plot_positionslice(ts_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
-    #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-   
-
-    ## Animation
-    #fps = 25
-    #loop = 0
-    #ffmpeg_exe(`-v error -framerate $fps -loop $loop -i $(ds.config.output.dir      )/pos_%04d.png output/Plummer-DirectSum.mp4`)
-    #ffmpeg_exe(`-v error -framerate $fps -loop $loop -i $(ds_adapt.config.output.dir)/pos_%04d.png output/Plummer-DirectSumAdaptive.mp4`)
-    #ffmpeg_exe(`-v error -framerate $fps -loop $loop -i $(ts.config.output.dir      )/pos_%04d.png output/Plummer-Tree.mp4`)
-    #ffmpeg_exe(`-v error -framerate $fps -loop $loop -i $(ts_adapt.config.output.dir)/pos_%04d.png output/Plummer-TreeAdaptive.mp4`)
 end
 
 plotfigs(ds, ds_adapt, ts, ts_adapt)
+```
 
+![Lagrangian Radii](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/03-plummer/Plummer-LagrangianRadii.png "Lagrangian Radii")
 
-# write success flag for shell
-success = open("output/success", "w")
-close(success)
-
-# Clear memory
-AstroNbodySim.clear()
+![Scale Radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/03-plummer/Plummer-ScaleRadius.png "Scale Radius")

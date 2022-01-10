@@ -6,6 +6,7 @@ In this example, we demonstrate how to:
 - Manually generate binary stars
 - Plot orbits with gapping
 - Add a background force field
+- Integrate elliptic orbits
 
 ## Circular binary
 
@@ -130,7 +131,7 @@ run(circular)
 plot_orbit_with_gap(circular, "Binary Circular")
 ```
 
-![Binary Circular](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/01-binary/Binary%20Circular%20of%20every%201%20orbit(s).png)
+![Binary Circular](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Binary%20Circular%20of%20every%201%20orbit(s).png "Binary Circular")
 
 ## Massless circular binary with background force field
 
@@ -175,4 +176,65 @@ run(bg)
 plot_orbit_with_gap(bg, "Binary Circular with bgforce")
 ```
 
-![Binary Circular](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/01-binary/Binary%20Circular%20with%bgforce%20of%20every%201%20orbit(s).png)
+![Binary Circular in Background Force Field](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Binary%20Circular%20with%bgforce%20of%20every%201%20orbit(s).png "Binary Circular in Background Force Field")
+
+
+## Elliptic orbit precision
+```julia
+R = 1.0u"kpc"
+mass = 1.0e8u"Msun"
+
+e = 0.9
+
+vel = sqrt((1.0-e)*G*mass/R)
+@info "Velocity at ap: $(vel)"
+
+a = ellipticSemiMajor(G, mass, R, vel)
+@info "Length of semi-major axis: $(a)"
+
+T = ellipticPeriod(G, mass, a)
+@info "Period of elliptical orbit: $(T)"
+
+data = StructArray(Star(uAstro, id = i) for i in 1:2)
+data.Mass[2] = mass
+
+data.Pos[1] = PVector(R, 0.0u"kpc", 0.0u"kpc")
+data.Vel[1] = PVector(0.0u"kpc/Gyr", vel, 0.0u"kpc/Gyr")
+
+
+NumOrbits = 200
+TimeEnd = NumOrbits * T * 1.001
+TimeBetweenSnapshots = TimeEnd
+
+# Adaptive timesteps
+elliptic_adapt = Simulation(
+    deepcopy(data);
+    analysers,
+    TimeEnd,
+    ErrTolTimestep = 0.05,
+    TimeBetweenSnapshots,
+    ForceSofteningTable = [0.001u"kpc" for i in 1:6],
+    OutputDir = "output/EllipticOrbitAdapt",
+)
+run(elliptic_adapt)
+df = plot_orbit_with_gap(elliptic_adapt, "Elliptic Orbit (adaptive)", 40, resolution = (600,300))
+
+# Fixed timesteps
+Δt = df.time[2:end-1] .- df.time[1:end-2]
+elliptic_const = Simulation(
+    deepcopy(data);
+    analysers,
+    TimeEnd,
+    TimeStep = minimum(Δt) * u"Gyr",
+    ErrTolTimestep = 0.1,
+    TimeBetweenSnapshots,
+    ForceSofteningTable = [0.01u"kpc" for i in 1:6],
+    OutputDir = "output/EllipticOrbitConst",
+)
+run(elliptic_const)
+df = plot_orbit_with_gap(elliptic_const, "Elliptic Orbit (const)", 40, resolution = (600,300))
+```
+
+![Elliptic Orbit with adaptive time-step](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Elliptic%20Orbit%20(adaptive)%20of%20every%2040%20orbit(s).png "Elliptic Orbit with adaptive time-step")
+
+![Elliptic Orbit with constant time-step](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Elliptic%20Orbit%20(constant)%20of%20every%2040%20orbit(s).png "Elliptic Orbit with constant time-step")

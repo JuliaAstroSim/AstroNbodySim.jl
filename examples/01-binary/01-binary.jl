@@ -225,14 +225,7 @@ df = plot_orbit_with_gap(elliptic_const, "Elliptic Orbit (const)", 40, resolutio
 
 ### Measurements
 # We use the same elliptic orbit
-#TODO: change the problem to satellites of earth
 #TODO: plot x-axis and y-axis uncertainties at the same time
-#TODO: 1. 卫星轨道预测的误差分布
-# 2. 空间碎片预测
-# 3. 小行星撞击预测
-# 4. 超高速星等轨道回溯的位置误差
-# 比如两个望远镜/方法观测同一个目标的时候，假设甲观测的位置精度高，而速度精度低；
-# 而乙观测的位置精度低，速度精度高，则可以对比两个观测误差对最终轨道预测的实际影响
 using Measurements
 G = Constant(Measurement, uAstro).G
 
@@ -298,20 +291,6 @@ function plot_orbit_with_uncertainties(sim::Simulation, title::String;
     xerror = Measurements.uncertainty.(xm)
     yerror = Measurements.uncertainty.(ym)
 
-    #=
-    scene, layout = layoutscene(; resolution)
-    axis = layout[1,1] = GLMakie.Axis(scene; title, xlabel, ylabel)
-    axis.autolimitaspect = 1
-
-    Makie.lines!(axis, x, y)
-    #Makie.errorbars!(axis, x, y, xerror, direction = :x, color = :red)
-    #Makie.errorbars!(axis, x, y, yerror, direction = :y, color = :red)
-    Makie.band!(axis, x, y.-yerror, y.+yerror)
-    #Makie.band!(axis, x, y.-yerror, y.+yerror)
-
-    Makie.save(joinpath("output/", title * ".png"), scene)
-    =#
-
     p = Plots.plot(x[1:flip], y[1:flip];
         ribbon = yerror[1:flip], legend=nothing,
         xlabel, ylabel, title,
@@ -330,67 +309,6 @@ Measurements.derivative(m.simdata.Pos[1].y.val, m.simdata.Mass[2].val)
 
 Measurements.uncertainty_components(m.simdata.Pos[1].y.val)
 
-
-## Satellite
-si()
-G = Constant(Measurement, uSI).G
-mass = measurement(uconvert(u"kg", 1.0u"Mearth"))
-R = measurement(3.0e7u"m", 10.0u"m")
-e = 0.9
-
-vel = sqrt((1.0-e)*G*mass/R)
-@info "Velocity at ap: $(vel)"
-
-a = ellipticSemiMajor(G, mass, R, vel)
-@info "Length of semi-major axis: $(a)"
-
-T = ellipticPeriod(G, mass, a)
-@info "Period of elliptical orbit: $(T)"
-
-TimeEnd = Measurements.value(T) * 0.95
-TimeBetweenSnapshots = TimeEnd
-
-# Position uncertainties
-data = StructArray(Star(Measurement, Int, uSI, id = i) for i in 1:2)
-data.Pos[1] = PVector(R, measurement(0.0u"m"), measurement(0.0u"m"))
-data.Vel[1] = PVector(measurement(0.0u"m/s"), measurement(Measurements.value(vel)), measurement(0.0u"m/s"))
-
-data.Mass[2] = mass
-
-simPos = Simulation(
-    deepcopy(data);
-    units = uSI,
-    analysers,
-    TimeEnd,
-    TimeBetweenSnapshots,
-    OutputDir = "output/Satellite-Position",
-    constants = Constant(Measurement, uSI),
-    ZeroValues = ZeroValue(Measurement, uSI),
-    ForceSofteningTable = measurement.([100.0u"m" for i in 1:6]),
-)
-run(simPos)
-plot_orbit_with_uncertainties(simPos, "Satellite orbit with position uncertainty", xlabel = "x [m]", ylabel = "y [m]")
-
-# Velocity uncertainties
-data = StructArray(Star(Measurement, Int, uSI, id = i) for i in 1:2)
-data.Pos[1] = PVector(R, measurement(0.0u"m"), measurement(0.0u"m"))
-data.Vel[1] = PVector(measurement(0.0u"m/s"), measurement(Measurements.value(vel), 10.0u"m/s"), measurement(0.0u"m/s"))
-
-data.Mass[2] = mass
-
-simVel = Simulation(
-    deepcopy(data);
-    units = uSI,
-    analysers,
-    TimeEnd,
-    TimeBetweenSnapshots,
-    OutputDir = "output/Satellite-Velocity",
-    constants = Constant(Measurement, uSI),
-    ZeroValues = ZeroValue(Measurement, uSI),
-    ForceSofteningTable = measurement.([100.0u"m" for i in 1:6]),
-)
-run(simVel)
-plot_orbit_with_uncertainties(simVel, "Satellite orbit with velocity uncertainty", xlabel = "x [m]", ylabel = "y [m]")
 
 
 ### Bigfloat

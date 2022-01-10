@@ -19,7 +19,7 @@ using Printf
 
 mkpathIfNotExist("output")
 
-header, d = read_gadget2(joinpath(@__DIR__, "galaxy_littleendian.dat"), uAstro, type=Star);  # 20000 disk and 40000 halo
+header, d = read_gadget2(joinpath(@__DIR__, "galaxy_littleendian.dat"), uAstro, type=Star);  # 20000 disk and 40000 halo particles
 #d64 = convert.(Float64, d)
 #data = convert.(Int, d64)
 
