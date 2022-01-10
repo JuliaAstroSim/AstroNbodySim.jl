@@ -55,22 +55,22 @@ or
 ![Uncertainty propagation](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/01-binary/Uncertainty%20of%20elliptic%20orbit.png)
 
 ### Autodiff of background potential field
-![Autodiff of background potential field](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/AutodiffBackground.png)
+![Autodiff of background potential field](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/AutodiffBackground.png)
 
 ### User-difined pipeline: Tidal disruption event (TDE)
 
 Position slices
 
-![User-difined pipeline: Tidal disruption event (TDE)](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/TDE-elliptic-mosaic.png)
+![User-difined pipeline: Tidal disruption event (TDE)](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png)
 
 Accretion history
 
-![User-difined pipeline: TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/TDE-elliptic-AccreationHistory.png)
+![User-difined pipeline: TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png)
 
 ### Lagrange radii and scale radius
-![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/03-plummer/Plummer-LagrangianRadii.png)
+![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/03-plummer/Plummer-LagrangianRadii.png)
 
-![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/03-plummer/Plummer-ScaleRadius.png)
+![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/03-plummer/Plummer-ScaleRadius.png)
 
 ## Supporting and Citing
 
