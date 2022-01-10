@@ -130,6 +130,8 @@ run(circular)
 plot_orbit_with_gap(circular, "Binary Circular")
 ```
 
+![Binary Circular](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/01-binary/Binary%20Circular%20of%20every%201%20orbit(s).png)
+
 ## Massless circular binary with background force field
 
 ```julia
@@ -172,3 +174,5 @@ bg = Simulation(
 run(bg)
 plot_orbit_with_gap(bg, "Binary Circular with bgforce")
 ```
+
+![Binary Circular](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/01-binary/Binary%20Circular%20with%bgforce%20of%20every%201%20orbit(s).png)

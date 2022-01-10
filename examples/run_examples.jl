@@ -10,7 +10,7 @@ function run_examples(;
     ],
     updatedoc = false,
 )
-    printstyled("Running examples of ISLENT project", color = :cyan)
+    printstyled("Running examples of AstroNbodySim project", color = :cyan)
 
     for example in examples
         printstyled("Running example $example...", color = :green)
