@@ -136,6 +136,6 @@ GLMakie.lines!(axis, df.time, N)
 Makie.save("output/TDE-elliptic-AccretionHistory.png", scene)
 ```
 
-![TDE position slice mosaic view](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png "TDE position slice mosaic view")
+![TDE position slice mosaic view](./pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png)
 
-![TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png "TDE accretion history")
+![TDE accretion history](./pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png)

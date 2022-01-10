@@ -63,4 +63,4 @@ Makie.lines!(axis, df.x, df.y)
 Makie.save(joinpath("output/AutodiffBackground.png"), scene)
 ```
 
-![Orbit in potential field of Plummer model](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/AutodiffBackground.png "Orbit in potential field of Plummer model")
+![Orbit in potential field of Plummer model](./pics/examples/AutodiffBackground.png)

@@ -56,7 +56,7 @@ or
    echo > output/stop
    ```
 4. It's convenient to check out supported function arguments and keywords by `help?` in `REPL`, for example,
-   ```jl
+   ```julia
    help?> prepare
    search: prepare preprocessdata
 

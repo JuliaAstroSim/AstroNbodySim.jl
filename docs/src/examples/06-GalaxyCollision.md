@@ -16,7 +16,6 @@ using AstroIC, AstroIO
 using AstroNbodySim
 using AstroPlot
 using GLMakie
-using FFMPEG
 using Printf
 
 mkpathIfNotExist("output")
@@ -56,4 +55,4 @@ plt = mosaicview(gpu.config.output.dir, "pos_", collect(1:9:100), ".png"; fillva
 save("output/mosaic-collision-DirectSumAdaptiveGPU.png", plt)
 ```
 
-![Galaxy collision](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/06-GalaxyCollision/mosaic-collision-DirectSumAdaptiveGPU.png "Galaxy collision")
+![Galaxy collision](./pics/examples/06-GalaxyCollision/mosaic-collision-DirectSumAdaptiveGPU.png)

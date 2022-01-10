@@ -130,6 +130,6 @@ end
 plotfigs(ds, ds_adapt, ts, ts_adapt)
 ```
 
-![Lagrangian Radii](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/03-plummer/Plummer-LagrangianRadii.png "Lagrangian Radii")
+![Lagrangian Radii](./pics/examples/03-plummer/Plummer-LagrangianRadii.png)
 
-![Scale Radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/03-plummer/Plummer-ScaleRadius.png "Scale Radius")
+![Scale Radius](./pics/examples/03-plummer/Plummer-ScaleRadius.png)

@@ -32,7 +32,7 @@ makedocs(
     clean = false,
     sitename = "AstroNbodySim.jl",
     authors = "islent",
-    linkcheck = !("skiplinks" in ARGS),
+    linkcheck = false,
     pages = [
         "Home" => "index.md",
         "Tutorials" => Any[
@@ -41,12 +41,6 @@ makedocs(
         "Manual" => Any[
             "manual/DirectSum.md",
         ],
-        "中文教程" => Any[
-            "ChineseTutorial/basic.md",
-        ],
-        "中文手册" => Any[
-            "ChineseManual/DirectSum.md",
-        ],
         "Examples" => Any[
             "examples/01-Binary.md",
             "examples/02-autodiff-bg.md",
@@ -54,7 +48,7 @@ makedocs(
             "examples/04-Bigfloat.md",
             "examples/05-plummer.md",
             "examples/06-GalaxyCollision.md",
-            "examples/07-TEDcluster.md",
+            "examples/07-TDEcluster.md",
             "examples/08-SolarSystem.md",
         ],
         "Library" => Any[
@@ -62,9 +56,15 @@ makedocs(
             "lib/Methods.md",
         ],
         "CITATION" => "citation.md",
-        #"contributing.md",
+        "Contributing" => "contributing.md",
+        "中文教程" => Any[
+            "ChineseTutorial/basic.md",
+        ],
+        "中文手册" => Any[
+            "ChineseManual/DirectSum.md",
+        ],
     ],
-    workdir = joinpath(@__DIR__, "../test"),
+    #workdir = joinpath(@__DIR__, "../test"),
     #strict = !("strict=false" in ARGS),
     #doctest = ("doctest=only" in ARGS) ? :only : true,
 )

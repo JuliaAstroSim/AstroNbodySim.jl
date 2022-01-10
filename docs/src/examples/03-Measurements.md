@@ -115,4 +115,4 @@ Measurements.derivative(m.simdata.Pos[1].y.val, m.simdata.Mass[2].val)
 Measurements.uncertainty_components(m.simdata.Pos[1].y.val)
 ```
 
-![Uncertainty of elliptic orbit](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Uncertainty%20of%20elliptic%20orbit.png "Uncertainty of elliptic orbit")
+![Uncertainty of elliptic orbit](./pics/examples/01-binary/Uncertainty of elliptic orbit.png)

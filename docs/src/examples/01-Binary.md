@@ -131,7 +131,7 @@ run(circular)
 plot_orbit_with_gap(circular, "Binary Circular")
 ```
 
-![Binary Circular](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Binary%20Circular%20of%20every%201%20orbit(s).png "Binary Circular")
+![Binary Circular](./pics/examples/01-binary/Binary Circular of every 1 orbit(s).png)
 
 ## Massless circular binary with background force field
 
@@ -176,7 +176,7 @@ run(bg)
 plot_orbit_with_gap(bg, "Binary Circular with bgforce")
 ```
 
-![Binary Circular in Background Force Field](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Binary%20Circular%20with%bgforce%20of%20every%201%20orbit(s).png "Binary Circular in Background Force Field")
+![Binary Circular in Background Force Field](./pics/examples/01-binary/Binary Circular with bgforce of every 1 orbit(s).png)
 
 
 ## Elliptic orbit precision
@@ -235,6 +235,6 @@ run(elliptic_const)
 df = plot_orbit_with_gap(elliptic_const, "Elliptic Orbit (const)", 40, resolution = (600,300))
 ```
 
-![Elliptic Orbit with adaptive time-step](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Elliptic%20Orbit%20(adaptive)%20of%20every%2040%20orbit(s).png "Elliptic Orbit with adaptive time-step")
+![Elliptic Orbit with adaptive time-step](./pics/examples/01-binary/Elliptic Orbit (adaptive) of every 40 orbit(s).png)
 
-![Elliptic Orbit with constant time-step](https://github.com/JuliaAstroSim/AstroNbodySim.jl/tree/main/docs/src/examples/pics/examples/01-binary/Elliptic%20Orbit%20(constant)%20of%20every%2040%20orbit(s).png "Elliptic Orbit with constant time-step")
+![Elliptic Orbit with constant time-step](./pics/examples/01-binary/Elliptic Orbit (const) of every 40 orbit(s).png)
