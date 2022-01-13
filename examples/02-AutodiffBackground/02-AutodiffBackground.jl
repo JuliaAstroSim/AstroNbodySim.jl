@@ -59,11 +59,11 @@ run(sim)
 # Plot
 title = "Orbit in potential field of Plummer model"
 df = DataFrame(CSV.File(joinpath(sim.config.output.dir, "analysis.csv")))
-scene, layout = layoutscene(resolution = (800,800))
-axis = layout[1,1] = GLMakie.Axis(scene; title, xlabel = "x [kpc]", ylabel = "y [kpc]")
+fig = Figure(resolution = (800,800))
+axis = GLMakie.Axis(fig[1,1]; title, xlabel = "x [kpc]", ylabel = "y [kpc]")
 axis.autolimitaspect = 1
 Makie.lines!(axis, df.x, df.y)
-Makie.save(joinpath("output/AutodiffBackground.png"), scene)
+Makie.save(joinpath("output/AutodiffBackground.png"), fig)
 
 # write success flag for shell
 success = open("output/success", "w")

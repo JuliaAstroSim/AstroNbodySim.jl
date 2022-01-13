@@ -19,15 +19,15 @@ end
 
 function makie_scatter(sim::Simulation, GravSolver::Gravity, Device::DeviceType; xlims=(0,1),ylims=(0,1),zlims=(0,1))
     pos = pack_pos(sim, GravSolver, Device)
-    sim.visinfo.PlotData = Node(pos)
-    sim.visinfo.scene = GLMakie.scatter(
+    sim.visinfo.PlotData = Observable(pos)
+    sim.visinfo.fig = GLMakie.scatter(
         sim.visinfo.PlotData;
         markersize = iszero(sim.visinfo.markersize) ? estimate_markersize(pos) : sim.visinfo.markersize,
         markerspace=SceneSpace,
         figure = (resolution = sim.visinfo.resolution,),
     )
 
-    f,a,p = sim.visinfo.scene
+    f,a,p = sim.visinfo.fig
     if a isa Makie.Axis # 2D
         if !isnothing(sim.visinfo.xlims)
             Makie.xlims!(a, sim.visinfo.xlims)
@@ -42,7 +42,7 @@ function makie_scatter(sim::Simulation, GravSolver::Gravity, Device::DeviceType;
         Makie.zlims!(a, sim.visinfo.zlims)
     end
 
-    display(sim.visinfo.scene)
+    display(sim.visinfo.fig)
     sim.visinfo.last_plot_time = time()
 end
 

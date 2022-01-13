@@ -165,11 +165,11 @@ end
 
 function plot_orbit(sim, title::String)
     df = DataFrame(CSV.File(joinpath(sim.config.output.dir, "analysis.csv")))
-    scene, layout = layoutscene(resolution = (960, 1080))
-    axis = layout[1,1] = GLMakie.Axis(scene; title, xlabel = "x [kpc]", ylabel = "y [kpc]")
+    fig = Figure(resolution = (960, 1080))
+    axis = GLMakie.Axis(fig[1,1]; title, xlabel = "x [kpc]", ylabel = "y [kpc]")
     axis.autolimitaspect = 1
     Makie.lines!(axis, df.x, df.y)
-    Makie.save(joinpath("output/Timestep", title * ".png"), scene);
+    Makie.save(joinpath("output/Timestep", title * ".png"), fig);
     return df
 end
 
@@ -199,17 +199,17 @@ end
     AdaptLeapfrog = integrate_adapt_leapfrog(N, t1, x1, v1, filename = "output/Timestep/BinaryFreeFall-AdaptLeapfrog.csv")
 
 
-    f = CairoMakie.Figure(; resolution = (1600, 900))
-    ax = CairoMakie.Axis(f[1,1],
+    f = GLMakie.Figure(; resolution = (1600, 900))
+    ax = GLMakie.Axis(f[1,1],
         title = "Time integration test: binary free fall",
         xlabel = "t [Gyr]",
         ylabel = "x [kpc]",
     )
-    CE = CairoMakie.lines!(ax, ustrip.(u"Gyr",    ConstEuler.t), ustrip.(u"kpc", ConstEuler.x),    color = colors[1])
-    CL = CairoMakie.lines!(ax, ustrip.(u"Gyr", ConstLeapfrog.t), ustrip.(u"kpc", ConstLeapfrog.x), color = colors[2])
-    AE = CairoMakie.lines!(ax, ustrip.(u"Gyr",    AdaptEuler.t), ustrip.(u"kpc", AdaptEuler.x),    color = colors[3])
-    AL = CairoMakie.lines!(ax, ustrip.(u"Gyr", AdaptLeapfrog.t), ustrip.(u"kpc", AdaptLeapfrog.x), color = colors[4])
-    legend = CairoMakie.Legend(f[1,2],
+    CE = GLMakie.lines!(ax, ustrip.(u"Gyr",    ConstEuler.t), ustrip.(u"kpc", ConstEuler.x),    color = colors[1])
+    CL = GLMakie.lines!(ax, ustrip.(u"Gyr", ConstLeapfrog.t), ustrip.(u"kpc", ConstLeapfrog.x), color = colors[2])
+    AE = GLMakie.lines!(ax, ustrip.(u"Gyr",    AdaptEuler.t), ustrip.(u"kpc", AdaptEuler.x),    color = colors[3])
+    AL = GLMakie.lines!(ax, ustrip.(u"Gyr", AdaptLeapfrog.t), ustrip.(u"kpc", AdaptLeapfrog.x), color = colors[4])
+    legend = GLMakie.Legend(f[1,2],
         [CE, CL, AE, AL],
         ["Euler const", "Leapfrog const", "Euler adapt", "Leapfrog adapt"],
     )
@@ -252,35 +252,35 @@ end
        AdaptEuler = integrate_adapt_euler(   N, t1, x1, v1, filename = "output/Timestep/BinaryCircular-AdaptEuler.csv")
     AdaptLeapfrog = integrate_adapt_leapfrog(N, t1, x1, v1, filename = "output/Timestep/BinaryCircular-AdaptLeapfrog.csv")
 
-    f = CairoMakie.Figure(; resolution = (1000, 1000))
-    ax = CairoMakie.Axis(f[1,1],
+    f = GLMakie.Figure(; resolution = (1000, 1000))
+    ax = GLMakie.Axis(f[1,1],
         title = "Time integration test: binary circular orbit (constant timestep)",
         xlabel = "x [kpc]",
         ylabel = "y [kpc]",
         aspect = AxisAspect(1.0),
     )
-    CE = CairoMakie.lines!(ax, ustrip.(u"kpc", StructArray(ConstEuler.x).x),    ustrip.(u"kpc", StructArray(   ConstEuler.x).y), color = colors[1],)
-    CL = CairoMakie.lines!(ax, ustrip.(u"kpc", StructArray(ConstLeapfrog.x).x), ustrip.(u"kpc", StructArray(ConstLeapfrog.x).y), color = colors[2],)
-    CairoMakie.xlims!(ax, (-1.1,1.1))
-    CairoMakie.ylims!(ax, (-1.1,1.1))
-    legend = CairoMakie.Legend(f[1,2],
+    CE = GLMakie.lines!(ax, ustrip.(u"kpc", StructArray(ConstEuler.x).x),    ustrip.(u"kpc", StructArray(   ConstEuler.x).y), color = colors[1],)
+    CL = GLMakie.lines!(ax, ustrip.(u"kpc", StructArray(ConstLeapfrog.x).x), ustrip.(u"kpc", StructArray(ConstLeapfrog.x).y), color = colors[2],)
+    GLMakie.xlims!(ax, (-1.1,1.1))
+    GLMakie.ylims!(ax, (-1.1,1.1))
+    legend = GLMakie.Legend(f[1,2],
         [CE, CL],
         ["Euler const", "Leapfrog const"],
     )
     Makie.save("output/Timestep/TimeIntegration-BinaryCircular-Const.png", f)
 
-    f = CairoMakie.Figure(; resolution = (1000, 1000))
-    ax = CairoMakie.Axis(f[1,1],
+    f = GLMakie.Figure(; resolution = (1000, 1000))
+    ax = GLMakie.Axis(f[1,1],
         title = "Time integration test: binary circular orbit (adaptive timestep)",
         xlabel = "x [kpc]",
         ylabel = "y [kpc]",
         aspect = AxisAspect(1.0),
     )
-    AE = CairoMakie.lines!(ax, ustrip.(u"kpc", StructArray(AdaptEuler.x).x),    ustrip.(u"kpc", StructArray(   AdaptEuler.x).y), color = colors[3],)
-    AL = CairoMakie.lines!(ax, ustrip.(u"kpc", StructArray(AdaptLeapfrog.x).x), ustrip.(u"kpc", StructArray(AdaptLeapfrog.x).y), color = colors[4],)
-    CairoMakie.xlims!(ax, (-1.1,1.1))
-    CairoMakie.ylims!(ax, (-1.1,1.1))
-    legend = CairoMakie.Legend(f[1,2],
+    AE = GLMakie.lines!(ax, ustrip.(u"kpc", StructArray(AdaptEuler.x).x),    ustrip.(u"kpc", StructArray(   AdaptEuler.x).y), color = colors[3],)
+    AL = GLMakie.lines!(ax, ustrip.(u"kpc", StructArray(AdaptLeapfrog.x).x), ustrip.(u"kpc", StructArray(AdaptLeapfrog.x).y), color = colors[4],)
+    GLMakie.xlims!(ax, (-1.1,1.1))
+    GLMakie.ylims!(ax, (-1.1,1.1))
+    legend = GLMakie.Legend(f[1,2],
         [AE, AL],
         ["Euler adapt", "Leapfrog adapt"],
     )

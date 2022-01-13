@@ -3,7 +3,7 @@ cd("AstroNbodySim/Benchmark")
 =#
 
 using BenchmarkTools
-using CairoMakie
+using GLMakie
 using PyPlot
 using CUDA
 using StructArrays

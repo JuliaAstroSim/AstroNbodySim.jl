@@ -54,21 +54,21 @@ function train_cnn_poisson2d(;
     @info("Start Training...")
     len_data = length(data_x)
 
-    scene, layout = layoutscene(resolution = (1600, 900))
-    AxisMSEloss = layout[1,1] = GLMakie.Axis(scene, title = "MSE Loss", xlabel = "iter")
-    AxisMaxloss = layout[1,2] = GLMakie.Axis(scene, title = "Max loss", xlabel = "iter")
+    fig = Figure(resolution = (1600, 900))
+    AxisMSEloss = GLMakie.Axis(fig[1,1], title = "MSE Loss", xlabel = "iter")
+    AxisMaxloss = GLMakie.Axis(fig[1,2], title = "Max loss", xlabel = "iter")
     
     MSElosses = Real[]
     Maxlosses = Real[]
     steps = Int[]
 
-    MSElossNode = Node(MSElosses)
-    MaxlossNode = Node(Maxlosses)
-    stepsNode = Node(steps)
+    MSElossNode = Observable(MSElosses)
+    MaxlossNode = Observable(Maxlosses)
+    stepsNode = Observable(steps)
 
     lines!(AxisMSEloss, stepsNode, MSElossNode)
     lines!(AxisMaxloss, stepsNode, MaxlossNode)
-    display(scene)
+    display(fig)
     
     iter = 0
     prog = Progress(train_nums*len_data*epochs; color = :light_blue)
@@ -129,7 +129,7 @@ function train_cnn_poisson2d(;
 
     xlims!(AxisMSEloss, (0, iter))
     xlims!(AxisMaxloss, (0, iter))
-    Makie.save(joinpath(path, "Train.png"), scene)
+    Makie.save(joinpath(path, "Train.png"), fig)
     @info("Training completed.")
 end
 

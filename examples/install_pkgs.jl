@@ -10,7 +10,6 @@ Pkg.add("Colors")
 Pkg.add("ColorSchemes")
 Pkg.add("FFMPEG")
 Pkg.add("GLMakie")
-Pkg.add("CairoMakie")
 Pkg.add("UnicodePlots")
 
 Pkg.add("CUDA")

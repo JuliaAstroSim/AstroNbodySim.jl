@@ -191,23 +191,23 @@ mkpathIfNotExist("output/PM")
             acc_ds = norm.(compute_force(ds, pos, 0.01u"kpc"))
             acc_pm = norm.(compute_force(pm, pos, 0.01u"kpc"))
             
-            scene, layout = layoutscene(; resolution = (800,450))
-            axis = layout[1,1] = GLMakie.Axis(scene,
+            f = Figure(; resolution = (800,450))
+            axis = GLMakie.Axis(f[1,1],
                 title = "Radial acceleration of single particle",
                 xlabel = "log10(R [kpc])",
                 ylabel = "log10(acc [kpc/Gyr^2])",
             )
             p1 = GLMakie.lines!(axis, log10.(R), log10.(ustrip.(u"kpc/Gyr^2", acc_ds)))
             p2 = GLMakie.lines!(axis, log10.(R), log10.(ustrip.(u"kpc/Gyr^2", acc_pm)))
-            legend = layout[1,1] = GLMakie.Legend(
-                scene, [p1,p2], ["DirectSum", "Particle-Mesh"],
+            legend = GLMakie.Legend(
+                f[1,1], [p1,p2], ["DirectSum", "Particle-Mesh"],
                 tellheight = false,
                 tellwidth = false,
                 halign = :right,
                 valign = :top,
                 margin = (10, 10, 10, 10),
             )
-            Makie.save("output/PM/StaticForceSingleParticle.png", scene)
+            Makie.save("output/PM/StaticForceSingleParticle.png", f)
         end
 
         @testset "Plummer star cluster" begin
@@ -231,23 +231,23 @@ mkpathIfNotExist("output/PM")
             compute_force(pm)
 
 
-            scene, layout = layoutscene(; resolution = (800,450))
-            axis = layout[1,1] = GLMakie.Axis(scene,
+            f = Figure(; resolution = (800,450))
+            axis = GLMakie.Axis(f[1,1],
                 title = "Radial acceleration of Plummer star cluster",
                 xlabel = "log10(R [kpc])",
                 ylabel = "log10(acc [kpc/Gyr^2])",
             )
             p1 = plot_force!(axis, get_local_data(ds), uAstro; savelog=false, markersize = 3.0)
             p2 = plot_force!(axis, get_local_data(pm), uAstro; savelog=false, markersize = 3.0)
-            legend = layout[1,1] = GLMakie.Legend(
-                scene, [p1,p2], ["DirectSum", "Particle-Mesh"],
+            legend = GLMakie.Legend(
+                f[1,1], [p1,p2], ["DirectSum", "Particle-Mesh"],
                 tellheight = false,
                 tellwidth = false,
                 halign = :right,
                 valign = :top,
                 margin = (10, 10, 10, 10),
             )
-            Makie.save("output/PM/StaticForcePlummer.png", scene)
+            Makie.save("output/PM/StaticForcePlummer.png", f)
         end
     end
 end
@@ -280,18 +280,18 @@ L2norm(r) = sqrt(sum((r.^2)/prod(size(r))))
             r = m.phi .- s
 
             f = Figure(; resolution = (1200,900))
-            a = CairoMakie.Axis(f[1,1]; title = "Error of potential $(Nx) $(traitstring(boundary))")
-            CairoMakie.lines!(a, r)
+            a = GLMakie.Axis(f[1,1]; title = "Error of potential $(Nx) $(traitstring(boundary))")
+            GLMakie.lines!(a, r)
             Makie.save("output/PM/fft1D-$(traitstring(boundary))-$(Nx)-error.png", f)
 
             f = Figure(; resolution = (1200,900))
-            a = CairoMakie.Axis(f[1,1]; title = "Solution of potential $(Nx) $(traitstring(boundary))")
-            CairoMakie.lines!(a, m.phi)
+            a = GLMakie.Axis(f[1,1]; title = "Solution of potential $(Nx) $(traitstring(boundary))")
+            GLMakie.lines!(a, m.phi)
             Makie.save("output/PM/fft1D-$(traitstring(boundary))-$(Nx)-solution.png", f)
 
             f = Figure(; resolution = (1200,900))
-            a = CairoMakie.Axis(f[1,1]; title = "Exact value of potential $(Nx) $(traitstring(boundary))")
-            CairoMakie.lines!(a, s)
+            a = GLMakie.Axis(f[1,1]; title = "Exact value of potential $(Nx) $(traitstring(boundary))")
+            GLMakie.lines!(a, s)
             Makie.save("output/PM/fft1D-$(traitstring(boundary))-$(Nx)-exact.png", f)
 
             return L2norm(r)
@@ -448,18 +448,18 @@ end
             r = Array(m.phi) .- s
 
             f = Figure(; resolution = (1200,900))
-            a = CairoMakie.Axis(f[1,1]; title = "Error of potential $(Nx) $(traitstring(boundary))")
-            CairoMakie.lines!(a, r)
+            a = GLMakie.Axis(f[1,1]; title = "Error of potential $(Nx) $(traitstring(boundary))")
+            GLMakie.lines!(a, r)
             Makie.save("output/PM/fdm1D-$(traitstring(device))-$(traitstring(boundary))-$(Nx)-error.png", f)
 
             f = Figure(; resolution = (1200,900))
-            a = CairoMakie.Axis(f[1,1]; title = "Solution of potential $(Nx) $(traitstring(boundary))")
-            CairoMakie.lines!(a, Array(m.phi))
+            a = GLMakie.Axis(f[1,1]; title = "Solution of potential $(Nx) $(traitstring(boundary))")
+            GLMakie.lines!(a, Array(m.phi))
             Makie.save("output/PM/fdm1D-$(traitstring(device))-$(traitstring(boundary))-$(Nx)-solution.png", f)
 
             f = Figure(; resolution = (1200,900))
-            a = CairoMakie.Axis(f[1,1]; title = "Exact value of potential $(Nx) $(traitstring(boundary))")
-            CairoMakie.lines!(a, s)
+            a = GLMakie.Axis(f[1,1]; title = "Exact value of potential $(Nx) $(traitstring(boundary))")
+            GLMakie.lines!(a, s)
             Makie.save("output/PM/fdm1D-$(traitstring(device))-$(traitstring(boundary))-$(Nx)-exact.png", f)
 
             return L2norm(r)

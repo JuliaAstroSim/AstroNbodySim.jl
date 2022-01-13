@@ -126,14 +126,14 @@ for i in 2:length(N)
 end
 @info "Total particles accreated: $(N[end])"
 
-scene, layout = layoutscene(; resolution = (800, 450))
-axis = layout[1,1] = GLMakie.Axis(scene,
+fig = Figure(; resolution = (800, 450))
+axis = GLMakie.Axis(fig[1,1],
     title = "Total number of accreated particles",
     xlabel = "t [Gyr]",
     ylabel = "N",
 )
 GLMakie.lines!(axis, df.time, N)
-Makie.save("output/TDE-elliptic-AccretionHistory.png", scene)
+Makie.save("output/TDE-elliptic-AccretionHistory.png", fig)
 ```
 
 ![TDE position slice mosaic view](./pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png)

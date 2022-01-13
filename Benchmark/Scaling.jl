@@ -95,17 +95,17 @@ df.Tree_distributed_mean .= time_mean.(x, "Tree", "distributed")
 CSV.write("output/Scaling.csv", df)
 
 # Plot multi-threading
-scene, layout = layoutscene()
-axis = layout[1,1] = GLMakie.Axis(
-    scene,
+fig = Figure()
+axis = GLMakie.Axis(
+    fig[1,1],
     title = "Scaling of mean total time",
     xlabel = "Threads or processes: log2(N)",
     ylabel = "log10(t [ns])",
 )
 p1 = GLMakie.lines!(axis, log2.(df.N), log10.(df.DS_multithread_mean))
 p2 = GLMakie.lines!(axis, log2.(df.N), log10.(df.Tree_multithread_mean))
-legend = layout[1,1] = Legend(
-    scene,
+legend = Legend(
+    fig[1,1],
     [p1,p2],
     [
         "DirectSum multi-threading",
@@ -117,20 +117,20 @@ legend = layout[1,1] = Legend(
     valign = :top,
     margin = (10, 10, 10, 10),
 )
-Makie.save("output/ScalingMultiThreading.png", scene)
+Makie.save("output/ScalingMultiThreading.png", fig)
 
 # Plot distributed
-scene, layout = layoutscene()
-axis = layout[1,1] = GLMakie.Axis(
-    scene,
+fig = Figure()
+axis = GLMakie.Axis(
+    fig[1,1],
     title = "Scaling of mean total time",
     xlabel = "Threads or processes: log2(N)",
     ylabel = "log10(t [ns])",
 )
 p1 = GLMakie.lines!(axis, log2.(df.N), log10.(df.DS_distributed_mean))
 p2 = GLMakie.lines!(axis, log2.(df.N), log10.(df.Tree_distributed_mean))
-legend = layout[1,1] = Legend(
-    scene,
+legend = Legend(
+    fig[1,1],
     [p1,p2],
     [
         "DirectSum distributed",
@@ -142,12 +142,12 @@ legend = layout[1,1] = Legend(
     valign = :top,
     margin = (10, 10, 10, 10),
 )
-Makie.save("output/ScalingDistributed.png", scene)
+Makie.save("output/ScalingDistributed.png", fig)
 
 # Plot multi-threading and distributed
-scene, layout = layoutscene(;resolution=(800,450))
-axis = layout[1,1] = GLMakie.Axis(
-    scene,
+fig = Figure(;resolution=(800,450))
+axis = GLMakie.Axis(
+    fig[1,1],
     title = "Scaling of mean total time",
     xlabel = "Threads or processes: log2(N)",
     ylabel = "log10(t [ns])",
@@ -156,8 +156,8 @@ p1 = GLMakie.lines!(axis, log2.(df.N), log10.(df.DS_multithread_mean))
 p2 = GLMakie.lines!(axis, log2.(df.N), log10.(df.DS_distributed_mean))
 p3 = GLMakie.lines!(axis, log2.(df.N), log10.(df.Tree_multithread_mean))
 p4 = GLMakie.lines!(axis, log2.(df.N), log10.(df.Tree_distributed_mean))
-legend = layout[1,1] = Legend(
-    scene,
+legend = Legend(
+    fig[1,1],
     [p1,p2,p3,p4],
     [
         "DirectSum multi-threading",
@@ -171,7 +171,7 @@ legend = layout[1,1] = Legend(
     valign = :top,
     margin = (10, 10, 10, 10),
 )
-Makie.save("output/Scaling.png", scene)
+Makie.save("output/Scaling.png", fig)
 
 
 ### Number of particles
@@ -209,9 +209,9 @@ CSV.write("output/ScalingNumber.csv", df)
 df = DataFrame(CSV.File("output/ScalingNumber.csv"))
 =#
 
-scene, layout = layoutscene(; resolution=(800,450))
-axis = layout[1,1] = GLMakie.Axis(
-    scene,
+fig = Figure(; resolution=(800,450))
+axis = GLMakie.Axis(
+    fig[1,1],
     title = "Scaling of mean total time",
     xlabel = "log10(N)",
     ylabel = "log10(t [ns])",
@@ -219,8 +219,8 @@ axis = layout[1,1] = GLMakie.Axis(
 p1 = GLMakie.lines!(axis, log10.(df.N), log10.(df.DS_mean))
 p2 = GLMakie.lines!(axis, log10.(df.N), log10.(df.DSGPU_mean))
 p3 = GLMakie.lines!(axis, log10.(df.N), log10.(df.Tree_mean))
-legend = layout[1,1] = Legend(
-    scene,
+legend = Legend(
+    fig[1,1],
     [
         p1,
         p2,
@@ -237,4 +237,4 @@ legend = layout[1,1] = Legend(
     valign = :top,
     margin = (10, 10, 10, 10),
 )
-Makie.save("output/ScalingNumber.png", scene)
+Makie.save("output/ScalingNumber.png", fig)

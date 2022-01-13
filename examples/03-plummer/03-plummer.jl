@@ -87,36 +87,36 @@ using FFMPEG
 
 function plotfigs(ds, ds_adapt, ts, ts_adapt)
     @info "Plotting radii"
-    ScaleScene, ScaleLayout = layoutscene(resolution = (800, 800))
-    LagrangeScene, LagrangeLayout = layoutscene(resolution = (800, 700))
+    FigScale    = Figure(resolution = (800, 800))
+    FigLagrange = Figure(resolution = (800, 700))
 
     colors = ColorSchemes.tab10.colors
 
-    AS1 = ScaleLayout[1,1] = GLMakie.Axis(ScaleScene, title = "Direct Sum const dt")
-    AS2 = ScaleLayout[1,2] = GLMakie.Axis(ScaleScene, title = "Direct Sum adaptive dt")
-    AS3 = ScaleLayout[2,1] = GLMakie.Axis(ScaleScene, title = "Tree const dt")
-    AS4 = ScaleLayout[2,2] = GLMakie.Axis(ScaleScene, title = "Tree adaptive dt")
+    AS1 = GLMakie.Axis(FigScale[1,1], title = "Direct Sum const dt")
+    AS2 = GLMakie.Axis(FigScale[1,2], title = "Direct Sum adaptive dt")
+    AS3 = GLMakie.Axis(FigScale[2,1], title = "Tree const dt")
+    AS4 = GLMakie.Axis(FigScale[2,2], title = "Tree adaptive dt")
 
-    AL1 = LagrangeLayout[1,1] = GLMakie.Axis(LagrangeScene, title = "Direct Sum const dt")
-    AL2 = LagrangeLayout[1,2] = GLMakie.Axis(LagrangeScene, title = "Direct Sum adaptive dt")
-    AL3 = LagrangeLayout[2,1] = GLMakie.Axis(LagrangeScene, title = "Tree const dt")
-    AL4 = LagrangeLayout[2,2] = GLMakie.Axis(LagrangeScene, title = "Tree adaptive dt")
+    AL1 = GLMakie.Axis(FigLagrange[1,1], title = "Direct Sum const dt")
+    AL2 = GLMakie.Axis(FigLagrange[1,2], title = "Direct Sum adaptive dt")
+    AL3 = GLMakie.Axis(FigLagrange[2,1], title = "Tree const dt")
+    AL4 = GLMakie.Axis(FigLagrange[2,2], title = "Tree adaptive dt")
 
-    plot_radii!(AS1, LagrangeScene, AL1, LagrangeLayout, ds.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
+    plot_radii!(AS1, FigLagrange, AL1, ds.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
     mv("radii.csv", "output/Plummer-DirectSum-radii.csv", force = true)
 
-    plot_radii!(AS2, LagrangeScene, AL2, LagrangeLayout, ds_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
+    plot_radii!(AS2, FigLagrange, AL2, ds_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
     mv("radii.csv", "output/Plummer-DirectSumAdaptive-radii.csv", force = true)
 
-    plot_radii!(AS3, LagrangeScene, AL3, LagrangeLayout, ts.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
+    plot_radii!(AS3, FigLagrange, AL3, ts.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
     mv("radii.csv", "output/Plummer-Tree-radii.csv", force = true)
 
-    plot_radii!(AS4, LagrangeScene, AL4, LagrangeLayout, ts_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
+    plot_radii!(AS4, FigLagrange, AL4, ts_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(); colors, times = collect(0.0:0.0005:0.1) * u"Gyr", legend=false)
     mv("radii.csv", "output/Plummer-TreeAdaptive-radii.csv", force = true)
 
     #LagrangeLayout[:,3] = GLMakie.Legend(
-    #    LagrangeScene,
-    #    LagrangeScene.children[1].plots[2:end],
+    #    FigLagrange[:,3],
+    #    FigLagrange.children[1].plots[2:end],
     #    ["10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%"];
     #    tellheight = false,
     #    tellwidth = false,
@@ -125,16 +125,16 @@ function plotfigs(ds, ds_adapt, ts, ts_adapt)
     #    margin = (0,0,0,0),
     #)
 
-    colsize!(LagrangeLayout, 1, Relative(0.47))
-    colsize!(LagrangeLayout, 2, Relative(0.47))
-    rowsize!(LagrangeLayout, 1, Relative(0.5))
-    rowsize!(LagrangeLayout, 2, Relative(0.5))
+    colsize!(FigLagrange.layout, 1, Relative(0.47))
+    colsize!(FigLagrange.layout, 2, Relative(0.47))
+    rowsize!(FigLagrange.layout, 1, Relative(0.5))
+    rowsize!(FigLagrange.layout, 2, Relative(0.5))
 
-    supertitle = ScaleLayout[0,:] = Label(ScaleScene, "Scale Radius")
-    Makie.save("output/Plummer-ScaleRadius.png", ScaleScene)
+    supertitle = Label(FigScale[0,:], "Scale Radius")
+    Makie.save("output/Plummer-ScaleRadius.png", FigScale)
 
-    supertitle = LagrangeLayout[0,:] = Label(LagrangeScene, "Lagrange Radii")
-    Makie.save("output/Plummer-LagrangianRadii.png", LagrangeScene)
+    supertitle = Label(FigLagrange[0,:], "Lagrange Radii")
+    Makie.save("output/Plummer-LagrangianRadii.png", FigLagrange)
     
 
     #@info "Plotting positions"

@@ -98,7 +98,7 @@ function benchmark_DifferencingEquation_1D_CPU(NumData;
     title = "Benchmark of solving matrix equations on CPU with $(Threads.nthreads()) threads",
     kw...
 )
-    scene, layout, df = benchmarkplot(
+    fig, df = benchmarkplot(
         [
             DifferencingEquation_LinearAlgebra_pinv,
             DifferencingEquation_LinearAlgebra_left_division_sparse,
@@ -118,9 +118,9 @@ function benchmark_DifferencingEquation_1D_CPU(NumData;
         savefolder,
         kw...
     )
-    Makie.save(joinpath(savefolder, "DifferencingEquation_CPU_1D_$(Threads.nthreads())_threads.png"), scene)
+    Makie.save(joinpath(savefolder, "DifferencingEquation_CPU_1D_$(Threads.nthreads())_threads.png"), fig)
     mv(joinpath(savefolder, "benchmark.csv"), joinpath(savefolder, "DifferencingEquation_CPU_1D_$(Threads.nthreads())_threads.csv"), force = true)
-    return scene, layout, df
+    return fig, df
 end
 
 function benchmark_DifferencingEquation_1D_GPU(NumData;
@@ -128,7 +128,7 @@ function benchmark_DifferencingEquation_1D_GPU(NumData;
     title = "Benchmark of solving matrix equations on GPU",
     kw...
 )
-    scene, layout, df = benchmarkplot(
+    fig, df = benchmarkplot(
         [
             #DifferencingEquation_LinearAlgebra_inv, #! Can't do inv on GPU
             DifferencingEquation_LinearAlgebra_pinv,
@@ -149,9 +149,9 @@ function benchmark_DifferencingEquation_1D_GPU(NumData;
         savefolder,
         kw...
     )
-    Makie.save(joinpath(savefolder, "DifferencingEquation_GPU_1D.png"), scene)
+    Makie.save(joinpath(savefolder, "DifferencingEquation_GPU_1D.png"), fig)
     mv(joinpath(savefolder, "benchmark.csv"), joinpath(savefolder, "DifferencingEquation_GPU_1D.csv"), force = true)
-    return scene, layout, df
+    return fig, df
 end
 
 # Plot in one
@@ -188,13 +188,13 @@ function benchmark_DifferencingEquation_1D(NumData;
         DifferencingEquation_GPU_1D,
     ]
 
-    scene, layout, df = benchmarkplot(
+    fig, df = benchmarkplot(
         Functions, Names, gen, NumData;
         savefolder, title, resolution,
         legend = false,
         kw...
     )
-    layout[1,1] = GLMakie.Legend(scene, scene.children[1].plots[2:end], Names;
+    GLMakie.Legend(fig[1,1], fig.children[1].plots[2:end], Names;
         tellheight = false,
         tellwidth = false,
         halign = :left,
@@ -202,9 +202,9 @@ function benchmark_DifferencingEquation_1D(NumData;
         margin = (10, 10, 10, 10),
     )
     
-    Makie.save(joinpath(savefolder, "BenchmarkDifferencingEquation1D.png"), scene)
+    Makie.save(joinpath(savefolder, "BenchmarkDifferencingEquation1D.png"), fig)
     mv(joinpath(savefolder, "benchmark.csv"), joinpath(savefolder, "DifferencingEquation1D.csv"), force = true)
-    return scene, layout, df
+    return fig, df
 end
 
 function benchmark_DifferencingEquation_2D(NumData;
@@ -240,13 +240,13 @@ function benchmark_DifferencingEquation_2D(NumData;
         DifferencingEquation_GPU_2D,
     ]
 
-    scene, layout, df = benchmarkplot(
+    fig, df = benchmarkplot(
         Functions, Names, gen, NumData;
         savefolder, title, resolution,
         legend = false,
         kw...
     )
-    layout[1,1] = GLMakie.Legend(scene, scene.children[1].plots[2:end], Names;
+    GLMakie.Legend(fig[1,1], fig.children[1].plots[2:end], Names;
         tellheight = false,
         tellwidth = false,
         halign = :left,
@@ -254,9 +254,9 @@ function benchmark_DifferencingEquation_2D(NumData;
         margin = (10, 10, 10, 10),
     )
     
-    Makie.save(joinpath(savefolder, "BenchmarkDifferencingEquation2D.png"), scene)
+    Makie.save(joinpath(savefolder, "BenchmarkDifferencingEquation2D.png"), fig)
     mv(joinpath(savefolder, "benchmark.csv"), joinpath(savefolder, "DifferencingEquation2D.csv"), force = true)
-    return scene, layout, df
+    return fig, df
 end
 
 function benchmark_DifferencingEquation_3D(NumData;
@@ -292,13 +292,13 @@ function benchmark_DifferencingEquation_3D(NumData;
         DifferencingEquation_GPU_3D,
     ]
 
-    scene, layout, df = benchmarkplot(
+    fig, df = benchmarkplot(
         Functions, Names, gen, NumData;
         savefolder, title, resolution,
         legend = false,
         kw...
     )
-    layout[1,1] = GLMakie.Legend(scene, scene.children[1].plots[2:end], Names;
+    GLMakie.Legend(fig[1,1], fig.children[1].plots[2:end], Names;
         tellheight = false,
         tellwidth = false,
         halign = :left,
@@ -306,7 +306,7 @@ function benchmark_DifferencingEquation_3D(NumData;
         margin = (10, 10, 10, 10),
     )
     
-    Makie.save(joinpath(savefolder, "BenchmarkDifferencingEquation3D.png"), scene)
+    Makie.save(joinpath(savefolder, "BenchmarkDifferencingEquation3D.png"), fig)
     mv(joinpath(savefolder, "benchmark.csv"), joinpath(savefolder, "DifferencingEquation3D.csv"), force = true)
-    return scene, layout, df
+    return fig, df
 end

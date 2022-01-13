@@ -3,33 +3,33 @@ mkpathIfNotExist("output/Plummer/")
 
 function plot_plummer(sim::Simulation, mode)
     # Plot profiling
-    scene, layout = plot_profiling(joinpath(sim.config.output.dir, "timing.csv"),
+    fig = plot_profiling(joinpath(sim.config.output.dir, "timing.csv"),
         title = "Profiling of " * mode,
         resolution = (1600,900),
     )
-    Makie.save("output/Plummer/Profiling-$(mode).png", scene)
+    Makie.save("output/Plummer/Profiling-$(mode).png", fig)
 
     # Plot energy
-    scene, layout, df = plot_energy(joinpath(sim.config.output.dir, "analysis.csv"))
-    Makie.save("output/Plummer/Energy-$(mode).png", scene)
+    fig, df = plot_energy(joinpath(sim.config.output.dir, "analysis.csv"))
+    Makie.save("output/Plummer/Energy-$(mode).png", fig)
 
-    scene, layout, df = plot_energy_delta(joinpath(sim.config.output.dir, "analysis.csv"))
-    Makie.save("output/Plummer/EnergyDelta-$(mode).png", scene)
+    fig, df = plot_energy_delta(joinpath(sim.config.output.dir, "analysis.csv"))
+    Makie.save("output/Plummer/EnergyDelta-$(mode).png", fig)
 
     # Plot momentum
-    scene, layout, df = plot_momentum(joinpath(sim.config.output.dir, "analysis.csv"); colors)
-    Makie.save("output/Plummer/Momentum-$(mode).png", scene)
+    fig, df = plot_momentum(joinpath(sim.config.output.dir, "analysis.csv"); colors)
+    Makie.save("output/Plummer/Momentum-$(mode).png", fig)
 
-    scene, layout, df = plot_momentum_angular(joinpath(sim.config.output.dir, "analysis.csv"); colors)
-    Makie.save("output/Plummer/MomentumAngular-$(mode).png", scene)
+    fig, df = plot_momentum_angular(joinpath(sim.config.output.dir, "analysis.csv"); colors)
+    Makie.save("output/Plummer/MomentumAngular-$(mode).png", fig)
 
     # Plot radii
-    ScaleScene, ScaleLayout, LagrangeScene, LagrangeLayout, df = plot_radii(
+    FigScale, FigLagrange, df = plot_radii(
         sim.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2();
         colors, times = collect(0.0:0.005:1.0)*u"Gyr",
     )
-    Makie.save("output/Plummer/ScaleRadius-$(mode).png", ScaleScene)
-    Makie.save("output/Plummer/LagrangianRadii-$(mode).png", LagrangeScene)
+    Makie.save("output/Plummer/ScaleRadius-$(mode).png", FigScale)
+    Makie.save("output/Plummer/LagrangianRadii-$(mode).png", FigLagrange)
     mv("radii.csv", "output/Plummer/radii-$(mode).csv", force = true)
     return true
 end

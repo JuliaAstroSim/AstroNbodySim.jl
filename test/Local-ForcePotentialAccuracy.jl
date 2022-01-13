@@ -202,39 +202,39 @@ function cluster_accuracy()
         deepcopy(particles),
         GravitySolver = Tree(),
     );
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Force Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(Δf/f)",
     )
     s = [Makie.lines!(axis, log10.(R), log10.(accuracy_force(ds, ts, pos, Smooth[i])), color = colors[i]) for i in eachindex(Smooth)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(Smooth), "smoothing length",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(Smooth), "smoothing length",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracySmoothingLength.png", scene)
+    Makie.save("./accuracy/ForceAccuracySmoothingLength.png", fig)
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Potential Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(|Δφ|/|φ|)",
     )
     s = [Makie.lines!(axis, log10.(R), log10.(accuracy_potential(ds, ts, pos, Smooth[i])), color = colors[i]) for i in eachindex(Smooth)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(Smooth), "smoothing length",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(Smooth), "smoothing length",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracySmoothingLength.png", scene)
+    Makie.save("./accuracy/PotentialAccuracySmoothingLength.png", fig)
 
     @info "Relative to opening angle"
     ic = PlummerStarCluster(
@@ -249,39 +249,39 @@ function cluster_accuracy()
     acc_ds = compute_force(ds, pos, 0.0u"kpc")
     pot_ds = compute_potential(ds, pos, 0.0u"kpc")
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Force Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(Δf/f)",
     )
     s = [Makie.lines!(axis, log10.(R), log10.(accuracy_force(acc_ds, pos, TreeOpenAngles[i], particles)), color = colors[i]) for i in eachindex(TreeOpenAngles)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(TreeOpenAngles), "Opening Angle",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(TreeOpenAngles), "Opening Angle",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracyOpeningAngle.png", scene)
+    Makie.save("./accuracy/ForceAccuracyOpeningAngle.png", fig)
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Potential Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(|Δφ|/|φ|)",
     )
     s = [Makie.lines!(axis, log10.(R), log10.(accuracy_potential(pot_ds, pos, TreeOpenAngles[i], particles)), color = colors[i]) for i in eachindex(TreeOpenAngles)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(TreeOpenAngles), "Opening Angle",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(TreeOpenAngles), "Opening Angle",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracyOpeningAngle.png", scene)
+    Makie.save("./accuracy/PotentialAccuracyOpeningAngle.png", fig)
 end
 
 cluster_accuracy()
@@ -290,34 +290,34 @@ function scatter_accuracy(N::Int)
     @info "Relative to particle number"
     radii, ratio = accuracy_force(N)
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Force Error ($N particles)",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(Δf/f)",
     )
     s = Makie.scatter!(axis, log10.(radii), log10.(ratio), markersize = 5.0)
-    Makie.save("./accuracy/ForceAccuracyScatter.png", scene)
+    Makie.save("./accuracy/ForceAccuracyScatter.png", fig)
 
 
     radii, ratio = accuracy_potential(N)
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Potential Error ($N particles)",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(|Δφ|/|φ|)",
     )
     s = Makie.scatter!(axis, log10.(radii), log10.(ratio), markersize = 5.0)
-    Makie.save("./accuracy/PotentialAccuracyScatter.png", scene)
+    Makie.save("./accuracy/PotentialAccuracyScatter.png", fig)
 end
 
 scatter_accuracy(1000)
 
 
-### Single particle
+### Single fig
 
 # Scatter plot
 function single_accuracy()
@@ -353,40 +353,40 @@ function single_accuracy()
         GravitySolver = Tree(),
     );
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Force Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(Δf/f)",
     )
     s = [Makie.scatter!(axis, log10.(R), log10.(accuracy_force(ds, ts, pos, Smooth[i])), color = colors[i]) for i in eachindex(Smooth)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(Smooth), "smoothing length",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(Smooth), "smoothing length",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracyScatterSmoothingLength.png", scene)
+    Makie.save("./accuracy/ForceAccuracyScatterSmoothingLength.png", fig)
     # No error, zero plot
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Potential Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(|Δφ|/|φ|)",
     )
     s = [Makie.scatter!(axis, log10.(R), log10.(accuracy_potential(ds, ts, pos, Smooth[i])), color = colors[i]) for i in eachindex(Smooth)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(Smooth), "smoothing length",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(Smooth), "smoothing length",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracyScatterSmoothingLength.png", scene)
+    Makie.save("./accuracy/PotentialAccuracyScatterSmoothingLength.png", fig)
     # No error, zero plot
 
 
@@ -394,43 +394,43 @@ function single_accuracy()
     acc_ds = compute_force(ds, pos, 0.0u"kpc")
     pot_ds = compute_potential(ds, pos, 0.0u"kpc")
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Force Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(Δf/f)",
     )
     s = [Makie.lines!(axis, log10.(R), log10.(accuracy_force(acc_ds, pos, TreeOpenAngles[i], particles)), color = colors[i]) for i in eachindex(TreeOpenAngles)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(TreeOpenAngles), "Opening Angle",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(TreeOpenAngles), "Opening Angle",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracyScatterOpeningAngle.png", scene)
+    Makie.save("./accuracy/ForceAccuracyScatterOpeningAngle.png", fig)
     # No error, zero plot
 
-    scene, layout = Makie.layoutscene(resolution = (800, 450))
-    axis = layout[1,1] = Makie.Axis(
-        scene,
+    fig = Makie.Figure(resolution = (800, 450))
+    axis = Makie.Axis(
+        fig[1,1],
         title = "Relative Potential Error",
         xlabel = "log10(R [kpc])",
         ylabel = "log10(|Δφ|/|φ|)",
     )
     s = [Makie.lines!(axis, log10.(R), log10.(accuracy_potential(pot_ds, pos, TreeOpenAngles[i], particles)), color = colors[i]) for i in eachindex(TreeOpenAngles)]
-    legend = layout[1,1] = Makie.Legend(
-        scene, s, string.(TreeOpenAngles), "Opening Angle",
+    legend = Makie.Legend(
+        fig[1,1], s, string.(TreeOpenAngles), "Opening Angle",
         tellheight = false,
         tellwidth = false,
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracyScatterOpeningAngle.png", scene)
+    Makie.save("./accuracy/PotentialAccuracyScatterOpeningAngle.png", fig)
     # No error, zero plot
 end
 
 single_accuracy()
 
-AstroNbodySim.clear()
+ISLENT.clear()

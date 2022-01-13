@@ -55,7 +55,7 @@ or
 ![Uncertainty propagation](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/01-binary/Uncertainty%20of%20elliptic%20orbit.png)
 
 ### Autodiff of background potential field
-![Autodiff of background potential field](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/AutodiffBackground.png)
+![Autodiff of background potential field](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/AutodiffBackground.png)
 
 ### User-difined pipeline: Tidal disruption event (TDE)
 

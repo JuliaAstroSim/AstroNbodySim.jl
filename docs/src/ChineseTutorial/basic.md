@@ -96,8 +96,7 @@ particles = generate(config)
 
 ```@example basic
 using AstroPlot
-scene, layout = plot_makie(particles)
-scene
+plot_makie(particles)
 ```
 
 ## Snapshot 文件读写

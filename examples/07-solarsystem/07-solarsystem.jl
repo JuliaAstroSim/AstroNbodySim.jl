@@ -17,60 +17,78 @@ using ProgressMeter
 using AstroIC
 data = solarsystem(now())
 
+Makie.inline!(false)
+GLMakie.activate!()
+
 unicode_scatter(data)
 
-scene = plot_makie(data, u"AU", markersize=500)
+#=
+f = plot_makie(data, u"AU", markersize=500)
 
-scene, layout = plot_positionslice(solarsystem(now()), u"AU",
+f = plot_positionslice(solarsystem(now()), u"AU",
     xlabel = "x [AU]", yaxis = :z, ylabel = "z [AU]",
     xlims = [-22, 22], ylims = [-22, 22],
     markersize = 2.0,
     title = "Solar System at " * string(now()),
 )
+Makie.save("output/Solar System at $(string(now())).png", f)
+=#
 
-function display_solarsystem(startdate = now(); fps = 60.0, N = 10000, ratio = 1.0)
+function display_solarsystem(startdate = now(); fps = 60.0, N = 10000, ratio = 1.0, adapt = true)
     last_plot_time = time()
     time_between_plot = 1.0 / fps # ms
 
     T = jdcnv(startdate)
 
-    scene, layout = layoutscene()
-    title = Node("Solar System at " * string(startdate))
-    ax = layout[1,1] = GLMakie.Axis(
-        scene,
+    fig = GLMakie.Figure()
+    
+    title = Observable("Solar System at " * string(startdate))
+    ax = GLMakie.Axis(
+        f[1,1],
         title = title,
         xlabel = "x [AU]",
         ylabel = "z [AU]",
         aspect = AxisAspect(1.0),
     )
-    #sl1 = layout[2, 1] = Slider(scene, text = "ratio", range = 0.1:0.01:10.0, startvalue = 2.0)
-    #ax2 = layout[2, 1]
-    ls = labelslider!(scene, "test label: ",  0.1:0.01:10.0)
+
+    ls = labelslider!(f, "time ratio: ",  0.1:0.01:10.0)
     ls.slider.value = ratio
-    layout[2,1] = ls.layout
+    f[2,1] = ls.layout
 
-    xy = ustrip.(u"AU", pack_xy(solarsystem(T), yaxis = :z))
-    GLMakie.xlims!(ax, (middle(xy[:,1]) - 22, middle(xy[:,1]) + 22))
-    GLMakie.ylims!(ax, (middle(xy[:,2]) - 22, middle(xy[:,2]) + 22))
+    xu, yu = pack_xy(solarsystem(T), yaxis = :z)
+    x = ustrip.(u"AU", xu)
+    y = ustrip.(u"AU", yu)
+    if adapt
+        GLMakie.xlims!(ax, (middle(x) - 22, middle(x) + 22))
+        GLMakie.ylims!(ax, (middle(y) - 22, middle(y) + 22))
+    else
+        GLMakie.xlims!(ax, (-30, +30))
+        GLMakie.ylims!(ax, (-30, +30))
+    end
 
-    pos = Node(xy)
+    pos = Observable([x y])
     GLMakie.scatter!(ax, pos, markersize = 5.0)
-    display(scene)
+    display(f)
 
     @showprogress for i in 1:N
         if time() - last_plot_time > time_between_plot
             #T += to_value(sl1.value)
             T += to_value(ls.slider.value)
-            xy = ustrip.(u"AU", pack_xy(solarsystem(T), yaxis = :z))
-            GLMakie.xlims!(ax, (middle(xy[:,1]) - 22, middle(xy[:,1]) + 22))
-            GLMakie.ylims!(ax, (middle(xy[:,2]) - 22, middle(xy[:,2]) + 22))
+            
+            xu, yu = pack_xy(solarsystem(T), yaxis = :z)
+            x = ustrip.(u"AU", xu)
+            y = ustrip.(u"AU", yu)        
+            if adapt
+                GLMakie.xlims!(ax, (middle(x) - 22, middle(x) + 22))
+                GLMakie.ylims!(ax, (middle(y) - 22, middle(y) + 22))
+            end
             @async title[] = "Solar System at " * string(daycnv(T))
-            @async pos[] = xy
+            @async pos[] = [x y]
             last_plot_time = time()
         end
         sleep(0.1 / fps)
     end
-    return scene
+    return fig
 end
 
 #=

@@ -29,7 +29,7 @@ end
 function saverestart(sim::Simulation)
     if sim.visinfo.Realtime
         sim.visinfo.PlotData = nothing
-        sim.visinfo.scene = nothing
+        sim.visinfo.fig = nothing
     end
 
     saverestart(sim, sim.config.solver.grav, sim.config.device.type)

@@ -797,7 +797,7 @@ mutable struct VisualizationInfo
 
     PlotData
     resolution
-    scene
+    fig
 
     Realtime::Bool
     RenderTime::Float64   # s. Interactively render a new frame for every RenderTime
