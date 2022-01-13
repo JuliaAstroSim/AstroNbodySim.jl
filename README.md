@@ -45,8 +45,8 @@ or
 
 ## Features quick view
 
-### Realtime visualization on GPU
-![Realtime visualization on GPU](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/readme/Plummer.gif)
+### Realtime visualization of simulations on GPU
+![Realtime visualization of simulations on GPU](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/readme/Plummer.gif)
 
 ### Galactic collision
 ![Galactic collision](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/readme/GalacticCollision.gif)
@@ -59,11 +59,11 @@ or
 
 ### User-difined pipeline: Tidal disruption event (TDE)
 
-Position slices
+Position slices:
 
 ![User-difined pipeline: Tidal disruption event (TDE)](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png)
 
-Accretion history
+Accretion history:
 
 ![User-difined pipeline: TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png)
 
@@ -71,6 +71,9 @@ Accretion history
 ![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/03-plummer/Plummer-LagrangianRadii.png)
 
 ![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/03-plummer/Plummer-ScaleRadius.png)
+
+### Solar System
+![Solar System](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/readme/SolarSystem.gif
 
 ## Supporting and Citing
 

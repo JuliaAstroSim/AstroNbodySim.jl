@@ -56,3 +56,5 @@ save("output/mosaic-collision-DirectSumAdaptiveGPU.png", plt)
 ```
 
 ![Galaxy collision](./pics/examples/06-GalaxyCollision/mosaic-collision-DirectSumAdaptiveGPU.png)
+
+![Galaxy collision animation](./pics/readme/GalacticCollision.gif)

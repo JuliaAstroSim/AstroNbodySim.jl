@@ -23,15 +23,15 @@ GLMakie.activate!()
 unicode_scatter(data)
 
 #=
-f = plot_makie(data, u"AU", markersize=500)
+fig = plot_makie(data, u"AU", markersize=500)
 
-f = plot_positionslice(solarsystem(now()), u"AU",
+fig = plot_positionslice(solarsystem(now()), u"AU",
     xlabel = "x [AU]", yaxis = :z, ylabel = "z [AU]",
     xlims = [-22, 22], ylims = [-22, 22],
     markersize = 2.0,
     title = "Solar System at " * string(now()),
 )
-Makie.save("output/Solar System at $(string(now())).png", f)
+Makie.save("output/Solar System at $(string(now())).png", fig)
 =#
 
 function display_solarsystem(startdate = now(); fps = 60.0, N = 10000, ratio = 1.0, adapt = true)
@@ -44,16 +44,16 @@ function display_solarsystem(startdate = now(); fps = 60.0, N = 10000, ratio = 1
     
     title = Observable("Solar System at " * string(startdate))
     ax = GLMakie.Axis(
-        f[1,1],
+        fig[1,1],
         title = title,
         xlabel = "x [AU]",
         ylabel = "z [AU]",
         aspect = AxisAspect(1.0),
     )
 
-    ls = labelslider!(f, "time ratio: ",  0.1:0.01:10.0)
+    ls = labelslider!(fig, "time ratio: ",  0.1:0.01:10.0)
     ls.slider.value = ratio
-    f[2,1] = ls.layout
+    fig[2,1] = ls.layout
 
     xu, yu = pack_xy(solarsystem(T), yaxis = :z)
     x = ustrip.(u"AU", xu)
@@ -68,7 +68,7 @@ function display_solarsystem(startdate = now(); fps = 60.0, N = 10000, ratio = 1
 
     pos = Observable([x y])
     GLMakie.scatter!(ax, pos, markersize = 5.0)
-    display(f)
+    display(fig)
 
     @showprogress for i in 1:N
         if time() - last_plot_time > time_between_plot
@@ -93,6 +93,7 @@ end
 
 #=
 display_solarsystem()
+display_solarsystem(adapt = false)
 =#
 
 
