@@ -116,7 +116,7 @@ function plotfigs(ds, ds_adapt, ts, ts_adapt)
 
     #LagrangeLayout[:,3] = GLMakie.Legend(
     #    FigLagrange[:,3],
-    #    FigLagrange.children[1].plots[2:end],
+    #    FigLagrange.scene.children[1].plots[2:end],
     #    ["10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%"];
     #    tellheight = false,
     #    tellwidth = false,

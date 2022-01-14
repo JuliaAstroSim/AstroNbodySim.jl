@@ -217,7 +217,7 @@ function cluster_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracySmoothingLength.png", fig)
+    Makie.save("./output/accuracy/ForceAccuracySmoothingLength.png", fig)
 
     fig = Makie.Figure(resolution = (800, 450))
     axis = Makie.Axis(
@@ -234,7 +234,7 @@ function cluster_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracySmoothingLength.png", fig)
+    Makie.save("./output/accuracy/PotentialAccuracySmoothingLength.png", fig)
 
     @info "Relative to opening angle"
     ic = PlummerStarCluster(
@@ -264,7 +264,7 @@ function cluster_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracyOpeningAngle.png", fig)
+    Makie.save("./output/accuracy/ForceAccuracyOpeningAngle.png", fig)
 
     fig = Makie.Figure(resolution = (800, 450))
     axis = Makie.Axis(
@@ -281,7 +281,7 @@ function cluster_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracyOpeningAngle.png", fig)
+    Makie.save("./output/accuracy/PotentialAccuracyOpeningAngle.png", fig)
 end
 
 cluster_accuracy()
@@ -298,7 +298,7 @@ function scatter_accuracy(N::Int)
         ylabel = "log10(Δf/f)",
     )
     s = Makie.scatter!(axis, log10.(radii), log10.(ratio), markersize = 5.0)
-    Makie.save("./accuracy/ForceAccuracyScatter.png", fig)
+    Makie.save("./output/accuracy/ForceAccuracyScatter.png", fig)
 
 
     radii, ratio = accuracy_potential(N)
@@ -311,7 +311,7 @@ function scatter_accuracy(N::Int)
         ylabel = "log10(|Δφ|/|φ|)",
     )
     s = Makie.scatter!(axis, log10.(radii), log10.(ratio), markersize = 5.0)
-    Makie.save("./accuracy/PotentialAccuracyScatter.png", fig)
+    Makie.save("./output/accuracy/PotentialAccuracyScatter.png", fig)
 end
 
 scatter_accuracy(1000)
@@ -368,7 +368,7 @@ function single_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracyScatterSmoothingLength.png", fig)
+    Makie.save("./output/accuracy/ForceAccuracyScatterSmoothingLength.png", fig)
     # No error, zero plot
 
     fig = Makie.Figure(resolution = (800, 450))
@@ -386,7 +386,7 @@ function single_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracyScatterSmoothingLength.png", fig)
+    Makie.save("./output/accuracy/PotentialAccuracyScatterSmoothingLength.png", fig)
     # No error, zero plot
 
 
@@ -409,7 +409,7 @@ function single_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/ForceAccuracyScatterOpeningAngle.png", fig)
+    Makie.save("./output/accuracy/ForceAccuracyScatterOpeningAngle.png", fig)
     # No error, zero plot
 
     fig = Makie.Figure(resolution = (800, 450))
@@ -427,7 +427,7 @@ function single_accuracy()
         halign = :right,
         valign = :top,
     )
-    Makie.save("./accuracy/PotentialAccuracyScatterOpeningAngle.png", fig)
+    Makie.save("./output/accuracy/PotentialAccuracyScatterOpeningAngle.png", fig)
     # No error, zero plot
 end
 

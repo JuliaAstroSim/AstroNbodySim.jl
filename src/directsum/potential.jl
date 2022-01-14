@@ -82,7 +82,7 @@ function compute_local_potential(sim::Simulation, ::DirectSum, ::CPU)
     PosType = typeof(sim.config.ZeroValues.pos)
     pot = Vector{PotentialToEvaluate{PosType}}()
     for i in eachindex(data)
-        push!(pot, PotentialToEvaluate(i, data.Pos[i], data.Collection[i], softlen(data[i], sim)))
+        push!(pot, PotentialToEvaluate(i, data.Pos[i], data.Collection[i], softlen(data.Collection[i], sim)))
     end
     
     for p in sim.pids

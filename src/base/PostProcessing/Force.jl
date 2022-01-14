@@ -4,11 +4,14 @@
 Apply `f` to all particles in data by calling `data.Acc[i] += f(data[i])`.
 `f` must return a `PVector` in the unit of physical acceleration.
 """
-Base.@propagate_inbounds function apply_background_force(f::Function, data::StructArray)
+Base.@propagate_inbounds function apply_background_force(f::Function, data::StructArray, system_time_int::Int)
     Threads.@threads for k in 1:Threads.nthreads()
         Head, Tail = split_block(length(data), k, Threads.nthreads())
         for i in Head:Tail
-            data.Acc[i] += f(data[i])
+            @inbounds te = data.Ti_endstep[i]
+            if te == system_time_int
+                @inbounds data.Acc[i] += f(data[i])
+            end
         end
     end
 end
@@ -32,12 +35,12 @@ function postprocessing_force(sim::Simulation, ::Gravity, ::CPU)
     data = get_local_data(sim)
 
     for f in sim.bgforce
-        apply_background_force(f, data)
+        apply_background_force(f, data, sim.timeinfo.system_time_int)
     end
 
     # MOND - Milgrom 1983
     if sim.config.grav.model isa MOND1983Milgrom
-        mond_Milgrom1983(sim, data)
+        mond_Milgrom1983(sim, data, sim.timeinfo.system_time_int)
     end
 
     compute_OldAcc(data)

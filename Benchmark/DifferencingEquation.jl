@@ -194,7 +194,7 @@ function benchmark_DifferencingEquation_1D(NumData;
         legend = false,
         kw...
     )
-    GLMakie.Legend(fig[1,1], fig.children[1].plots[2:end], Names;
+    GLMakie.Legend(fig[1,1], fig.scene.children[1].plots[2:end], Names;
         tellheight = false,
         tellwidth = false,
         halign = :left,
@@ -246,7 +246,7 @@ function benchmark_DifferencingEquation_2D(NumData;
         legend = false,
         kw...
     )
-    GLMakie.Legend(fig[1,1], fig.children[1].plots[2:end], Names;
+    GLMakie.Legend(fig[1,1], fig.scene.children[1].plots[2:end], Names;
         tellheight = false,
         tellwidth = false,
         halign = :left,
@@ -298,7 +298,7 @@ function benchmark_DifferencingEquation_3D(NumData;
         legend = false,
         kw...
     )
-    GLMakie.Legend(fig[1,1], fig.children[1].plots[2:end], Names;
+    GLMakie.Legend(fig[1,1], fig.scene.children[1].plots[2:end], Names;
         tellheight = false,
         tellwidth = false,
         halign = :left,

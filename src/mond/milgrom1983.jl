@@ -30,15 +30,18 @@ end
 
 Apply Milgrom 1983 formula of MOND (MOdified Newtonian Dynamics) to accelerations
 """
-function mond_Milgrom1983(sim::Simulation, data::StructArray)
+function mond_Milgrom1983(sim::Simulation, data::StructArray, system_time_int::Int)
     nuIndex = sim.config.grav.MOND_nuIndex
     ACC0 = sim.config.constants.ACC0
 
     Threads.@threads for k in 1:Threads.nthreads()
         Head, Tail = split_block(length(data), k, Threads.nthreads())
         for i in Head:Tail
-            @inbounds NewtonAcc = data[i].Acc
-            @inbounds data.Acc[i] = NewtonAcc * nu(norm(NewtonAcc) / ACC0, nuIndex)
+            @inbounds te = data.Ti_endstep[i]
+            if te == system_time_int
+                @inbounds NewtonAcc = data[i].Acc
+                @inbounds data.Acc[i] = NewtonAcc * nu(norm(NewtonAcc) / ACC0, nuIndex)
+            end
         end
     end
 end

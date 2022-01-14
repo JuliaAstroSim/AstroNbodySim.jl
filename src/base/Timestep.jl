@@ -206,10 +206,6 @@ function find_next_sync_point_and_drift(sim::Simulation, TimestepConfig::Constan
         sim.config.output.func(sim, sim.config.output.type)
         add_timer(sim, OUTPUT, t_OUTPUT, time_ns())
 
-        t_ANALYSIS = time_ns()
-        write_analysis(sim)
-        add_timer(sim, ANALYSIS, t_ANALYSIS, time_ns())
-
         sim.timeinfo.next_output_time_float += sim.config.time.BetweenSnapshots
     end
 
@@ -239,10 +235,6 @@ function find_next_sync_point_and_drift(sim::Simulation, TimestepConfig::Adaptiv
         t_OUTPUT = time_ns()
         sim.config.output.func(sim, sim.config.output.type)
         add_timer(sim, OUTPUT, t_OUTPUT, time_ns())
-
-        t_ANALYSIS = time_ns()
-        write_analysis(sim)
-        add_timer(sim, ANALYSIS, t_ANALYSIS, time_ns())
 
         sim.timeinfo.next_output_time_int += sim.config.time.BetweenSnapshotsInt
     end

@@ -26,9 +26,9 @@ x = [1, 2, 4, 8]
 
 @warn "Remember to change the path to julia executable"
 if Base.Sys.islinux()
-    julia_executable = "/mnt/G/linuxwork/julia-1.7.0/usr/bin/julia"
+    julia_executable = "/mnt/E/linuxwork/julia-1.7.1/bin/julia"
 elseif Base.Sys.iswindows()
-    julia_executable = "E:\\julia-1.7.0/bin/julia.exe"
+    julia_executable = "E:\\julia-1.7.1/bin/julia.exe"
 end
 
 

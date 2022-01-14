@@ -92,8 +92,11 @@ function compute_local_force(sim::Simulation, ::DirectSum, ::CPU)
     Threads.@threads for k in 1:Threads.nthreads()
         Head, Tail = split_block(length(data), k, Threads.nthreads())
         for i in Head:Tail
-            @inbounds h = sim.config.grav.ForceSofteningTable[Int(data.Collection[i])]
-            @inbounds data.Acc[i] = compute_force_at_point(data.Pos[i], data, G, h)
+            @inbounds te = data.Ti_endstep[i]
+            if te == sim.timeinfo.system_time_int
+                @inbounds h = sim.config.grav.ForceSofteningTable[Int(data.Collection[i])]
+                @inbounds data.Acc[i] = compute_force_at_point(data.Pos[i], data, G, h)
+            end
         end
     end
     
@@ -101,7 +104,10 @@ function compute_local_force(sim::Simulation, ::DirectSum, ::CPU)
     # Force to compute on remote workers
     grav = Array{GravToEvaluate{PosType, OldAccType, LenType}, 1}()
     for i in eachindex(data)
-        push!(grav, GravToEvaluate(i, data.Pos[i], data.Collection[i], data.OldAcc[i], softlen(data.Collection[i], sim)))
+        @inbounds te = data.Ti_endstep[i]
+        if te == sim.timeinfo.system_time_int
+            push!(grav, GravToEvaluate(i, data.Pos[i], data.Collection[i], data.OldAcc[i], softlen(data.Collection[i], sim)))
+        end
     end
 
     for p in sim.pids
