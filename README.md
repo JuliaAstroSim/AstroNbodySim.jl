@@ -95,3 +95,5 @@ This software was developed as part of academic research. If you would like to h
 - Meshes: [PhysicalMeshes.jl](https://github.com/JuliaAstroSim/PhysicalMeshes.jl)
 - Plotting: [AstroPlot.jl](https://github.com/JuliaAstroSim/AstroPlot.jl)
 - Simulation: [AstroNbodySim](https://github.com/JuliaAstroSim/AstroNbodySim.jl)
+- Benchmark: [BenchmarkPlots](https://github.com/JuliaAstroSim/BenchmarkPlots.jl)
+- Parameter space exploration: [ParameterSpace](https://github.com/JuliaAstroSim/ParameterSpace.jl)
