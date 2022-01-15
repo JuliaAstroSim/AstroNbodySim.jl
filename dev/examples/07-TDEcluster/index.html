@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>07 Tidal Disruption Event (TDE) of Star Cluster · AstroNbodySim.jl</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153693590-1"></script><script>  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-153693590-1', {'page_path': location.pathname + location.search + location.hash});
+</script><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://juliaastrosims.github.io/AstroNbodySim.jl/dev/examples/07-TDEcluster/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/alpha_small.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="AstroNbodySim.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">AstroNbodySim.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../../tutorial/basic/">Basic</a></li></ul></li><li><span class="tocitem">Manual</span><ul><li><a class="tocitem" href="../../manual/DirectSum/">DirectSum</a></li></ul></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../01-Binary/">01 Binary orbit</a></li><li><a class="tocitem" href="../02-autodiff-bg/">02 Autodiff on background potential field</a></li><li><a class="tocitem" href="../03-Measurements/">03 Measurements: Uncertainty propagation</a></li><li><a class="tocitem" href="../04-Bigfloat/">04 BigFloat</a></li><li><a class="tocitem" href="../05-plummer/">05 Plummer Star Cluster</a></li><li><a class="tocitem" href="../06-GalaxyCollision/">06 Galaxy Collision (GPU)</a></li><li class="is-active"><a class="tocitem" href>07 Tidal Disruption Event (TDE) of Star Cluster</a></li><li><a class="tocitem" href="../08-SolarSystem/">08 Solar System</a></li></ul></li><li><span class="tocitem">Library</span><ul><li><a class="tocitem" href="../../lib/Types/">Types</a></li><li><a class="tocitem" href="../../lib/Methods/">Methods</a></li></ul></li><li><a class="tocitem" href="../../citation/">CITATION</a></li><li><a class="tocitem" href="../../contributing/">Contributing</a></li><li><span class="tocitem">中文教程</span><ul><li><a class="tocitem" href="../../ChineseTutorial/basic/">基础使用</a></li></ul></li><li><span class="tocitem">中文手册</span><ul><li><a class="tocitem" href="../../ChineseManual/DirectSum/">DirectSum 直接相加法</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>07 Tidal Disruption Event (TDE) of Star Cluster</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>07 Tidal Disruption Event (TDE) of Star Cluster</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/master/docs/src/examples/07-TDEcluster.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Tidal-Disruption-Event-(TDE)-of-Star-Cluster"><a class="docs-heading-anchor" href="#Tidal-Disruption-Event-(TDE)-of-Star-Cluster">07 Tidal Disruption Event (TDE) of Star Cluster</a><a id="Tidal-Disruption-Event-(TDE)-of-Star-Cluster-1"></a><a class="docs-heading-anchor-permalink" href="#Tidal-Disruption-Event-(TDE)-of-Star-Cluster" title="Permalink"></a></h1><p>In this example, we demonstrate how to:</p><ul><li>Define custom procedures to be executed in each time-step</li><li>Remove accreted particles on the run</li><li>Write and visualize accretion history</li><li>Estimate properties of the black hole</li></ul><pre><code class="language-julia hljs">
+using AstroNbodySim, PhysicalParticles
+using Unitful, UnitfulAstro
+using AstroIC
+using AstroPlot
+using DataFrames, CSV
+using GLMakie
+astro()
+mkpathIfNotExist(&quot;output&quot;)
+
+constant = Constant(uAstro)
+G = constant.G
+c = constant.c
+MassBH = 1.0e8u&quot;Msun&quot;
+
+M = 1.0e6u&quot;Msun&quot; # mass of Plummer star cluster
+R = 0.01u&quot;kpc&quot;  # orbit radius at AP
+
+Rg = r_g(G,MassBH,c)
+@show &quot;Schwarzchild radius: $(Rg)&quot;
+
+
+# Define the background force field of central black hole
+#! For distributed computing, use @everywhere
+function newtonAcc(p::AbstractParticle)
+    return - G * MassBH / (p.Pos * p.Pos) * ustrip(u&quot;kpc&quot;, normalize(p.Pos))
+end
+bgforce = Function[newtonAcc]
+
+
+&quot;&quot;&quot;
+    accretion(sim::Simulation)
+
+If the particle runs too close to the BH, delete it and append to accretion list.
+&quot;&quot;&quot;
+function accretion(sim::Simulation) # Direct Sum multi-threading on CPU
+    list = Int[]
+    pos = sim.simdata.Pos
+    for i in eachindex(pos)
+        if norm(pos[i]) &lt;= 10000*Rg
+            push!(list, i)
+        end
+    end
+    StructArrays.foreachfield(v-&gt;deleteat!(v,list), sim.simdata)
+    return length(list)
+end
+analysers = Dict(
+    &quot;accretion&quot; =&gt; accretion,
+)
+
+
+### TDE of star cluster with elliptic orbit
+
+e = 0.94 # eccentricity
+
+vel = sqrt((1.0-e)*G*MassBH/R)
+@info &quot;Velocity at ap: $(vel)&quot;
+
+a = ellipticSemiMajor(G, MassBH, R, vel)
+@info &quot;Length of semi-major axis: $(a)&quot;
+
+T = ellipticPeriod(G, MassBH, a)
+@info &quot;Period of elliptical orbit: $(T)&quot;
+
+pe = (1-e)/(1+e)*R
+@info &quot;pe orbit radius: $(pe)&quot;
+
+
+particles = generate(PlummerStarCluster(
+        NumSamples = 400,
+        VirialRadius = 0.001u&quot;kpc&quot;,
+        TotalMass = M,
+    ),
+    MaxRadius = 0.003u&quot;kpc&quot;,
+);
+
+setpos(particles, PVector(R, 0.0u&quot;kpc&quot;, 0.0u&quot;kpc&quot;))
+setvel(particles, PVector(0.0u&quot;kpc/Gyr&quot;, vel, 0.0u&quot;kpc/Gyr&quot;))
+
+
+TimeEnd = T
+TimeBetweenSnapshots = T / 100
+
+
+elliptic = Simulation(
+    deepcopy(particles);
+    MinStep = 1.0e-11u&quot;Gyr&quot;,
+    TimeEnd,
+    TimeBetweenSnapshots,
+    bgforce,
+    analysers,
+    OutputDir = &quot;output/TDE-elliptic&quot;,
+    ForceSofteningTable = [0.05*suggest_softlen(particles) for i in 1:6],
+)
+run(elliptic)
+
+
+### Plot
+L = ustrip(R)
+plot_positionslice(elliptic.config.output.dir, &quot;snapshot_&quot;, collect(0:100), &quot;.gadget2&quot;, gadget2(),
+    dpi = 300, resolution = (600,600),
+    xlims = (-0.6L, +1.4L), ylims = (-L, +L),
+    times = collect(0:100) * TimeBetweenSnapshots,
+    markersize = 0.0001,
+)
+plt = mosaicview(elliptic.config.output.dir, &quot;pos_&quot;, collect(1:9:100), &quot;.png&quot;; fillvalue = 0.5, npad = 3, ncol = 4, rowmajor = true);
+save(&quot;output/TDE-elliptic-mosaic.png&quot;, plt)
+
+# Accretion history
+df = DataFrame(CSV.File(joinpath(elliptic.config.output.dir, &quot;analysis.csv&quot;)))
+N = similar(df.accretion)
+N[1] = df.accretion[1]
+s = N[1]
+for i in 2:length(N)
+    @inbounds s += df.accretion[i]
+    @inbounds N[i] = s
+end
+@info &quot;Total particles accreated: $(N[end])&quot;
+
+fig = Figure(; resolution = (800, 450))
+axis = GLMakie.Axis(fig[1,1],
+    title = &quot;Total number of accreated particles&quot;,
+    xlabel = &quot;t [Gyr]&quot;,
+    ylabel = &quot;N&quot;,
+)
+GLMakie.lines!(axis, df.time, N)
+Makie.save(&quot;output/TDE-elliptic-AccretionHistory.png&quot;, fig)</code></pre><p><img src="../pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png" alt="TDE position slice mosaic view"/></p><p><img src="../pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png" alt="TDE accretion history"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../06-GalaxyCollision/">« 06 Galaxy Collision (GPU)</a><a class="docs-footer-nextpage" href="../08-SolarSystem/">08 Solar System »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Saturday 15 January 2022 04:06">Saturday 15 January 2022</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

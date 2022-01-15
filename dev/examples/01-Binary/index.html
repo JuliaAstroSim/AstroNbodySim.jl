@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>01 Binary orbit · AstroNbodySim.jl</title><script async src="https://www.googletagmanager.com/gtag/js?id=UA-153693590-1"></script><script>  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-153693590-1', {'page_path': location.pathname + location.search + location.hash});
+</script><script data-outdated-warner src="../../assets/warner.js"></script><link rel="canonical" href="https://juliaastrosims.github.io/AstroNbodySim.jl/dev/examples/01-Binary/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/alpha_small.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="AstroNbodySim.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">AstroNbodySim.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../../tutorial/basic/">Basic</a></li></ul></li><li><span class="tocitem">Manual</span><ul><li><a class="tocitem" href="../../manual/DirectSum/">DirectSum</a></li></ul></li><li><span class="tocitem">Examples</span><ul><li class="is-active"><a class="tocitem" href>01 Binary orbit</a><ul class="internal"><li><a class="tocitem" href="#Circular-binary"><span>Circular binary</span></a></li><li><a class="tocitem" href="#Massless-circular-binary-with-background-force-field"><span>Massless circular binary with background force field</span></a></li><li><a class="tocitem" href="#Elliptic-orbit-precision"><span>Elliptic orbit precision</span></a></li></ul></li><li><a class="tocitem" href="../02-autodiff-bg/">02 Autodiff on background potential field</a></li><li><a class="tocitem" href="../03-Measurements/">03 Measurements: Uncertainty propagation</a></li><li><a class="tocitem" href="../04-Bigfloat/">04 BigFloat</a></li><li><a class="tocitem" href="../05-plummer/">05 Plummer Star Cluster</a></li><li><a class="tocitem" href="../06-GalaxyCollision/">06 Galaxy Collision (GPU)</a></li><li><a class="tocitem" href="../07-TDEcluster/">07 Tidal Disruption Event (TDE) of Star Cluster</a></li><li><a class="tocitem" href="../08-SolarSystem/">08 Solar System</a></li></ul></li><li><span class="tocitem">Library</span><ul><li><a class="tocitem" href="../../lib/Types/">Types</a></li><li><a class="tocitem" href="../../lib/Methods/">Methods</a></li></ul></li><li><a class="tocitem" href="../../citation/">CITATION</a></li><li><a class="tocitem" href="../../contributing/">Contributing</a></li><li><span class="tocitem">中文教程</span><ul><li><a class="tocitem" href="../../ChineseTutorial/basic/">基础使用</a></li></ul></li><li><span class="tocitem">中文手册</span><ul><li><a class="tocitem" href="../../ChineseManual/DirectSum/">DirectSum 直接相加法</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>01 Binary orbit</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>01 Binary orbit</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/master/docs/src/examples/01-Binary.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Binary-orbit"><a class="docs-heading-anchor" href="#Binary-orbit">01 Binary orbit</a><a id="Binary-orbit-1"></a><a class="docs-heading-anchor-permalink" href="#Binary-orbit" title="Permalink"></a></h1><p>In this example, we demonstrate how to:</p><ul><li>Output simulation information on the run</li><li>Estimate properties of binary orbit and config the simulation</li><li>Manually generate binary stars</li><li>Plot orbits with gapping</li><li>Add a background force field</li><li>Integrate elliptic orbits</li></ul><h2 id="Circular-binary"><a class="docs-heading-anchor" href="#Circular-binary">Circular binary</a><a id="Circular-binary-1"></a><a class="docs-heading-anchor-permalink" href="#Circular-binary" title="Permalink"></a></h2><pre><code class="language-julia hljs">using AstroIO
+using AstroPlot
+using AstroPlot.ColorSchemes
+using Colors
+using CSV, DataFrames
+
+using Plots
+pyplot() # Need PyPlot to be installed
+
+using AstroNbodySim
+using PhysicalParticles
+using Unitful, UnitfulAstro
+astro()
+mkpathIfNotExist(&quot;output&quot;)
+
+function plot_orbit_with_gap(sim::Simulation, title::String, gap::Int = 1; resolution = (800,800), kw...)
+    df = DataFrame(CSV.File(joinpath(sim.config.output.dir, &quot;analysis.csv&quot;)))
+    x = df.x
+    y = df.y
+
+    title *= &quot; of every $(gap) orbit(s)&quot;
+    
+    count = 0
+    flip = 0
+    Head = 1
+    last_sign = sign(y[1])
+
+    plot_x = []
+    plot_y = []
+    for i in 1:length(y)
+        @inbounds new_sign = sign(y[i])
+        if new_sign != last_sign    # half cycle
+            flip += 1
+            last_sign = new_sign
+            
+            if flip % 2 == 0        # full cycle
+                count += 1
+                if count % gap == 0 # plot this cycle
+                    push!(plot_x, x[Head:i])
+                    push!(plot_y, y[Head:i])
+                    count = 0       # Reset gap
+                end
+                Head = i            # start of cycle
+            end
+        end
+        # do nothing
+    end
+
+    p = Plots.plot(plot_x, plot_y,
+        aspect_ratio = 1, legend = nothing, xlabel = &quot;x [kpc]&quot;, ylabel = &quot;y [kpc]&quot;,
+        size = resolution,
+    )
+    savefig(p, &quot;output/&quot; * title * &quot;.png&quot;)
+    @info &quot;Total orbits: $(div(flip, 2))&quot;
+    @info &quot;Steps per orbit: $(length(y) / div(flip, 2))&quot;
+    @info &quot;Figure has been saved to &quot; * title * &quot;.png&quot;
+    return df
+end</code></pre><p><code>analysers::Dict</code> has full access to simulation data. The key values are functions that return one printable value, and they will be written in <code>analysis.csv</code>. Here we find one of the particle and output its x- and y- coordinates.</p><pre><code class="language-julia hljs">p1x(sim::Simulation) = find_particle(sim, 1).Pos.x
+p1y(sim::Simulation) = find_particle(sim, 1).Pos.y
+
+analysers = Dict(
+    &quot;x&quot; =&gt; p1x,
+    &quot;y&quot; =&gt; p1y,
+)</code></pre><p>Now we estimate the orbit properties and set up the simulation</p><pre><code class="language-julia hljs">G = Constant(uAstro).G
+mass = 1.0e10u&quot;Msun&quot;
+D = 2.0u&quot;kpc&quot;
+
+binary_orbit_period(mass, D) = 2 * pi * sqrt(0.5 * D^3 / G / mass)
+
+binary_rot_vel(mass, D) = sqrt(G * mass / D / 2.0)
+
+vel = binary_rot_vel(mass, D)
+T = binary_orbit_period(mass, D)
+
+@info &quot;Estimated Period: $(T)&quot;
+@info &quot;Estimated Rotation Vel: $(vel)&quot;
+
+# Define the two particles
+data = StructArray(Star(uAstro, id = i) for i in 1:2);
+data.Pos[1] = PVector(+0.5D, 0.0u&quot;kpc&quot;, 0.0u&quot;kpc&quot;);
+data.Pos[2] = PVector(-0.5D, 0.0u&quot;kpc&quot;, 0.0u&quot;kpc&quot;);
+data.Vel[1] = PVector(0.0u&quot;kpc/Gyr&quot;, +vel, 0.0u&quot;kpc/Gyr&quot;);
+data.Vel[2] = PVector(0.0u&quot;kpc/Gyr&quot;, -vel, 0.0u&quot;kpc/Gyr&quot;);
+data.Mass .= mass;
+
+# Define simulations
+function compute_dt(a::Number; SofteningLength = 0.0001u&quot;kpc&quot;, ErrTolTimestep = 0.025)
+    return sqrt(2 * ErrTolTimestep * SofteningLength / abs(a))
+end
+
+TimeStep = compute_dt(G*mass/D^2)
+TimeEnd = T * 1.01
+TimeBetweenSnapshots = TimeEnd
+
+circular = Simulation(
+    deepcopy(data);
+    analysers,
+    TimeEnd,
+    TimeStep,
+    TimeBetweenSnapshots,
+    OutputDir = &quot;output/BinaryCircular&quot;,
+);
+run(circular)
+plot_orbit_with_gap(circular, &quot;Binary Circular&quot;)</code></pre><p><img src="../pics/examples/01-binary/Binary Circular of every 1 orbit(s).png" alt="Binary Circular"/></p><h2 id="Massless-circular-binary-with-background-force-field"><a class="docs-heading-anchor" href="#Massless-circular-binary-with-background-force-field">Massless circular binary with background force field</a><a id="Massless-circular-binary-with-background-force-field-1"></a><a class="docs-heading-anchor-permalink" href="#Massless-circular-binary-with-background-force-field" title="Permalink"></a></h2><pre><code class="language-julia hljs">mass = 0.5e10u&quot;Msun&quot;
+R = 1.0u&quot;kpc&quot;
+
+binary_orbit_period(mass, R) = 2 * pi * sqrt(R^3 / G / mass)
+binary_rot_vel(mass, R) = sqrt(G * mass / R)
+
+vel = binary_rot_vel(mass, R)
+T = binary_orbit_period(mass, R)
+
+@info &quot;Estimated Period: $(T)&quot;
+@info &quot;Estimated Rotation Vel: $(vel)&quot;
+
+# The only difference is that the particles have no mass, so they cannot produce any mutual forces
+data = StructArray(Star(uAstro, id = i) for i in 1:2);
+data.Pos[1] = PVector(+R, 0.0u&quot;kpc&quot;, 0.0u&quot;kpc&quot;);
+data.Pos[2] = PVector(-R, 0.0u&quot;kpc&quot;, 0.0u&quot;kpc&quot;);
+data.Vel[1] = PVector(0.0u&quot;kpc/Gyr&quot;, +vel, 0.0u&quot;kpc/Gyr&quot;);
+data.Vel[2] = PVector(0.0u&quot;kpc/Gyr&quot;, -vel, 0.0u&quot;kpc/Gyr&quot;);
+
+# Define the background force field
+attractor(p::AbstractParticle) = -G * mass / (p.Pos * p.Pos) * normalize(p.Pos) / 1.0u&quot;kpc&quot;
+bgforce = Function[attractor]
+
+TimeEnd = T * 1.01
+TimeStep = compute_dt(G*mass/R^2)
+TimeBetweenSnapshots = TimeEnd
+
+bg = Simulation(
+    deepcopy(data);
+    bgforce,
+    analysers,
+    TimeEnd,
+    TimeStep,
+    TimeBetweenSnapshots,
+    OutputDir = &quot;output/bgforce&quot;,
+);
+run(bg)
+plot_orbit_with_gap(bg, &quot;Binary Circular with bgforce&quot;)</code></pre><p><img src="../pics/examples/01-binary/Binary Circular with bgforce of every 1 orbit(s).png" alt="Binary Circular in Background Force Field"/></p><h2 id="Elliptic-orbit-precision"><a class="docs-heading-anchor" href="#Elliptic-orbit-precision">Elliptic orbit precision</a><a id="Elliptic-orbit-precision-1"></a><a class="docs-heading-anchor-permalink" href="#Elliptic-orbit-precision" title="Permalink"></a></h2><pre><code class="language-julia hljs">R = 1.0u&quot;kpc&quot;
+mass = 1.0e8u&quot;Msun&quot;
+
+e = 0.9
+
+vel = sqrt((1.0-e)*G*mass/R)
+@info &quot;Velocity at ap: $(vel)&quot;
+
+a = ellipticSemiMajor(G, mass, R, vel)
+@info &quot;Length of semi-major axis: $(a)&quot;
+
+T = ellipticPeriod(G, mass, a)
+@info &quot;Period of elliptical orbit: $(T)&quot;
+
+data = StructArray(Star(uAstro, id = i) for i in 1:2)
+data.Mass[2] = mass
+
+data.Pos[1] = PVector(R, 0.0u&quot;kpc&quot;, 0.0u&quot;kpc&quot;)
+data.Vel[1] = PVector(0.0u&quot;kpc/Gyr&quot;, vel, 0.0u&quot;kpc/Gyr&quot;)
+
+
+NumOrbits = 200
+TimeEnd = NumOrbits * T * 1.001
+TimeBetweenSnapshots = TimeEnd
+
+# Adaptive timesteps
+elliptic_adapt = Simulation(
+    deepcopy(data);
+    analysers,
+    TimeEnd,
+    ErrTolTimestep = 0.05,
+    TimeBetweenSnapshots,
+    ForceSofteningTable = [0.001u&quot;kpc&quot; for i in 1:6],
+    OutputDir = &quot;output/EllipticOrbitAdapt&quot;,
+)
+run(elliptic_adapt)
+df = plot_orbit_with_gap(elliptic_adapt, &quot;Elliptic Orbit (adaptive)&quot;, 40, resolution = (600,300))
+
+# Fixed timesteps
+Δt = df.time[2:end-1] .- df.time[1:end-2]
+elliptic_const = Simulation(
+    deepcopy(data);
+    analysers,
+    TimeEnd,
+    TimeStep = minimum(Δt) * u&quot;Gyr&quot;,
+    ErrTolTimestep = 0.1,
+    TimeBetweenSnapshots,
+    ForceSofteningTable = [0.01u&quot;kpc&quot; for i in 1:6],
+    OutputDir = &quot;output/EllipticOrbitConst&quot;,
+)
+run(elliptic_const)
+df = plot_orbit_with_gap(elliptic_const, &quot;Elliptic Orbit (const)&quot;, 40, resolution = (600,300))</code></pre><p><img src="../pics/examples/01-binary/Elliptic Orbit (adaptive) of every 40 orbit(s).png" alt="Elliptic Orbit with adaptive time-step"/></p><p><img src="../pics/examples/01-binary/Elliptic Orbit (const) of every 40 orbit(s).png" alt="Elliptic Orbit with constant time-step"/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../manual/DirectSum/">« DirectSum</a><a class="docs-footer-nextpage" href="../02-autodiff-bg/">02 Autodiff on background potential field »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.10 on <span class="colophon-date" title="Saturday 15 January 2022 04:06">Saturday 15 January 2022</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
