@@ -62,7 +62,7 @@ or
 
 吸积历史：
 
-![User-difined pipeline: TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png)
+![User-difined pipeline: TDE accretion history](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/07-TDEcluster/TDE-elliptic-AccretionHistory.png)
 
 ### 拉格朗日半径和标度半径（scale radius）
 ![Lagrange radii and scale radius](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/examples/03-plummer/Plummer-LagrangianRadii.png)
@@ -76,7 +76,7 @@ or
 
 本项目用于学术研究。欢迎 Star 来支持我们。如果你在研究、教学和其他活动中用到了我们的代码，请引用如下文章：
 ```tex
-% arxiv
+%TODO WIP
 ```
 
 ## 相关 Package

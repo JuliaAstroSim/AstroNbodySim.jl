@@ -58,8 +58,8 @@ cp(joinpath(@__DIR__, "../../../../examples/04-collisions/output/mosaic-collisio
 )
 
 ## 07-TDEcluster
-cp(joinpath(@__DIR__, "../../../../examples/05-TDE-StarCluster/output/TDE-elliptic-AccreationHistory.png"),
-   joinpath(@__DIR__, "./examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png"),
+cp(joinpath(@__DIR__, "../../../../examples/05-TDE-StarCluster/output/TDE-elliptic-AccretionHistory.png"),
+   joinpath(@__DIR__, "./examples/07-TDEcluster/TDE-elliptic-AccretionHistory.png"),
    force=true,
 )
 

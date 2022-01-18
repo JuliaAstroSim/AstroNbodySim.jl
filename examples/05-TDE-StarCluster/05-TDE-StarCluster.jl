@@ -78,7 +78,7 @@ pe = (1-e)/(1+e)*R
 
 
 particles = generate(PlummerStarCluster(
-        NumSamples = 400,
+        NumSamples = 5000,
         VirialRadius = 0.001u"kpc",
         TotalMass = M,
     ),
@@ -109,7 +109,7 @@ run(elliptic)
 ### Plot
 L = ustrip(R)
 plot_positionslice(elliptic.config.output.dir, "snapshot_", collect(0:100), ".gadget2", gadget2(),
-    dpi = 300, resolution = (600,600),
+    dpi = 300, resolution = (400,400),
     xlims = (-0.6L, +1.4L), ylims = (-L, +L),
     times = collect(0:100) * TimeBetweenSnapshots,
     markersize = 0.0001,
@@ -123,8 +123,8 @@ N = similar(df.accretion)
 N[1] = df.accretion[1]
 s = N[1]
 for i in 2:length(N)
-    @inbounds s += df.accretion[i]
-    @inbounds N[i] = s
+    @inbounds global s += df.accretion[i]
+    @inbounds global N[i] = s
 end
 @info "Total particles accreated: $(N[end])"
 

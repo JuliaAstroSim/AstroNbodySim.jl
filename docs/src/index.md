@@ -73,10 +73,10 @@ or
 
 ## Supporting and Citing
 
-This software was developed as part of academic research. If you would like to help support it, please star the repository. If you use this software as part of your research, teaching, or other activities, we would be grateful if you could cite the following:
+This software was developed as part of academic research. If you would like to help support it, please star the repository. If you use this software as part of your research, teaching, or other activities, please cite the following:
 
 ```tex
-% arxiv
+%TODO WIP
 ```
 
 ## Manual Outline

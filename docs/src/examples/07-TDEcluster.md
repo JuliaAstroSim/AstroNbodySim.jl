@@ -138,4 +138,4 @@ Makie.save("output/TDE-elliptic-AccretionHistory.png", fig)
 
 ![TDE position slice mosaic view](./pics/examples/07-TDEcluster/TDE-elliptic-mosaic.png)
 
-![TDE accretion history](./pics/examples/07-TDEcluster/TDE-elliptic-AccreationHistory.png)
+![TDE accretion history](./pics/examples/07-TDEcluster/TDE-elliptic-AccretionHistory.png)

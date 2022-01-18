@@ -192,10 +192,6 @@ export
     ellipticPeriod,
     eccentricity,
     
-
-    ## Cosmology
-
-    
     ## Time scales
     typicalvelocity,
     meandensity,
