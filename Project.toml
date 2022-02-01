@@ -44,7 +44,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [compat]
 AstroIO = "0.1"
 BangBang = "0.3"
-CSV = "0.9"
+CSV = "0.9, 0.10"
 CUDA = "3"
 DataFrames = "1"
 DocStringExtensions = "0.8"
