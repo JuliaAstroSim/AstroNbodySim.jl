@@ -189,29 +189,56 @@ function diff2_central_op(Δx)
     SVector{3}([1,-2,1]) / Δx / Δx
 end
 
-function diff_central_x(Δx, u::AbstractArray{T,3}) where T
+function diff_central_x(Δx, u::AbstractArray{T,1}, pad = zero(T)) where T
+    LenX = length(u)
+    kernel = diff_central_op(Δx)
+    h = div(length(kernel), 2)
+    d1 = PaddedView(pad, u, (1-h:LenX+h,))
+    @tullio out[x]:=d1[x+i] * kernel[i]
+    return parent(out)
+end
+
+function diff_central_x(Δx, u::AbstractArray{T,2}, pad = zero(T)) where T
+    LenX, LenY = size(u)
+    kernel = diff_central_op(Δx)
+    h = div(length(kernel), 2)
+    d1 = PaddedView(pad, u, (1-h:LenX+h,     1:LenY))
+    @tullio out[x,y]:=d1[x+i,y] * kernel[i]
+    return parent(out)
+end
+
+function diff_central_y(Δy, u::AbstractArray{T,2}, pad = zero(T)) where T
+    LenX, LenY, LenZ = size(u)
+    kernel = diff_central_op(Δy)
+    h = div(length(kernel), 2)
+    d1 = PaddedView(pad, u, (1:LenX,     1-h:LenY+h))
+    @tullio out[x,y]:=d1[x,y+i] * kernel[i]
+    return parent(out)
+end
+
+function diff_central_x(Δx, u::AbstractArray{T,3}, pad = zero(T)) where T
     LenX, LenY, LenZ = size(u)
     kernel = diff_central_op(Δx)
     h = div(length(kernel), 2)
-    d1 = PaddedView(zero(T), u, (1-h:LenX+h,     1:LenY, 1:LenZ))
+    d1 = PaddedView(pad, u, (1-h:LenX+h,     1:LenY, 1:LenZ))
     @tullio out[x,y,z]:=d1[x+i,y,z] * kernel[i]
     return parent(out)
 end
 
-function diff_central_y(Δy, u::AbstractArray{T,3}) where T
+function diff_central_y(Δy, u::AbstractArray{T,3}, pad = zero(T)) where T
     LenX, LenY, LenZ = size(u)
     kernel = diff_central_op(Δy)
     h = div(length(kernel), 2)
-    d1 = PaddedView(zero(T), u, (1:LenX,     1-h:LenY+h, 1:LenZ))
+    d1 = PaddedView(pad, u, (1:LenX,     1-h:LenY+h, 1:LenZ))
     @tullio out[x,y,z]:=d1[x,y+i,z] * kernel[i]
     return parent(out)
 end
 
-function diff_central_z(Δz, u::AbstractArray{T,3}) where T
+function diff_central_z(Δz, u::AbstractArray{T,3}, pad = zero(T)) where T
     LenX, LenY, LenZ = size(u)
     kernel = diff_central_op(Δz)
     h = div(length(kernel), 2)
-    d1 = PaddedView(zero(T), u, (1:LenX,     1:LenY, 1-h:LenZ+h))
+    d1 = PaddedView(pad, u, (1:LenX,     1:LenY, 1-h:LenZ+h))
     @tullio out[x,y,z]:=d1[x,y,z+i] * kernel[i]
     return parent(out)
 end
@@ -313,6 +340,7 @@ end
 function mesh_potential(p, Δ, rho, pos, G, Tphi)
     phi = zero(Tphi)
     #TODO multi-threading
+    #TODO potential for different dimensions?
     for i in eachindex(pos)
         r = norm(pos[i] - p)
         if !iszero(r)
