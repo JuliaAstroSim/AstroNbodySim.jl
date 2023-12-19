@@ -1,16 +1,4 @@
-function mkpathIfNotExist(dir)
-    if !isdir(dir)
-        mkpath(dir)
-    end
-end
 
-function need_to_interrupt(OutputDir::String)
-    if isfile(joinpath(OutputDir, "stop"))
-        return true
-    else
-        return false
-    end
-end
 
 function count_gadget_types(all_data::StructArray) where T<:AbstractParticle
     Counts = MVector{6,Int32}([0,0,0,0,0,0])

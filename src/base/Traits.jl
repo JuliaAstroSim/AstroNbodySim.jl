@@ -26,35 +26,6 @@ struct FEM <: Hydro end
 "Finite Volume Method"
 struct FVM <: Hydro end
 
-## gravity models
-"Gravity model. Supported: `Newton`, `MOND1983Milgrom`, `QUMOND`"
-abstract type GravityModel end
-"Traditional Newtonian gravity"
-struct Newton <: GravityModel end
-"Milgrom 1983 formula of MOND"
-struct MOND1983Milgrom <: GravityModel end
-"QUasi-linear MOdified Newtonian Dynamics"
-struct QUMOND <: GravityModel end
-
-## Logging mode
-abstract type LoggingMode end
-struct NormalMode <: LoggingMode end
-struct ProgressMode <: LoggingMode end
-struct SilentMode <: LoggingMode end
-
-abstract type DeviceType end
-struct CPU <: DeviceType end
-struct GPU <: DeviceType end
-
-# Time integration
-abstract type TimeIntegration end
-"1st-order explicit Euler time integration"
-struct Euler <: TimeIntegration end
-"Leapfrog time integration"
-struct Leapfrog <: TimeIntegration end
-#"Hierarchical time integration"
-#struct Hierarchical <: TimeIntegration end
-
 # GPU configuration
 abstract type GPUAlgorithm end
 struct AllPairs <: GPUAlgorithm end
@@ -75,17 +46,3 @@ struct Delete <: OutboundLimiter end
 struct DS <: OutboundLimiter end
 "Construct a coarse mesh to overlap all particles for non-periodic boundary conditions"
 struct CoarseMesh <: OutboundLimiter end
-
-# Trait functions
-
-"Better printing of trait types"
-traitstring(t) = string(t)[1:end-2]
-
-"""
-function emptyfunction(args...) end
-
-    Accept any outputs but doing nothing.
-
-    It is designed for initializing callback functions
-"""
-function emptyfunction(args...) end
