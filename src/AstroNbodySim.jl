@@ -54,6 +54,8 @@ using ParallelOperations
 @reexport using PhysicalMeshes
 @reexport using PhysicalTrees
 @reexport using AstroIO
+@reexport using PhysicalFDM
+@reexport using AstroSimBase
 
 # GPU
 using CUDA
@@ -89,14 +91,6 @@ export
         DirectSum, Tree, FDM, FFT, ML,
     Hydro,
         SPH, MHD, FEM, FVM,
-    GravityModel,
-        Newton, MOND1983Milgrom, QUMOND,
-    LoggingMode,
-        NormalMode, ProgressMode, SilentMode,
-    DeviceType,
-        CPU, GPU,
-    TimeIntegration,
-        Euler, RK4, Leapfrog, Hierarchical,
     GPUAlgorithm,
         AllPairs, Tiled,
     OutboundLimiter,
@@ -256,7 +250,6 @@ include("directsumgpu/timestep.jl")
 
 include("PM/gravity.jl")
 include("PM/fft.jl")
-include("PM/fdm.jl")
 include("PM/cnn.jl")
 include("PM/output.jl")
 include("PM/timestep.jl")

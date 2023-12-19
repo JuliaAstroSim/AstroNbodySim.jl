@@ -1,6 +1,11 @@
 const Atype = KnetArray{Float32}
 #const Atype = CuArray{Float32}
 
+function laplace_conv(a, Δ...)
+    kernel = laplace_conv_op(Δ...)
+    return imfilter(a, kernel, Fill(0))
+end
+
 function make_data(data_nums,data_size,sorts)
 
     if (sorts==0)||(sorts==4)||(sorts==6)||(sorts==10)

@@ -983,7 +983,7 @@ function Simulation(d;
                             Realtime = $Realtime, RenderTime = $RenderTime, resolution = $resolution,
                             xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
                         ),
-                        Buffer($config),
+                        AstroNbodySim.Buffer($config),
                         $bgforce, $bgpotential,
                     )))
             end
@@ -997,7 +997,7 @@ function Simulation(d;
                     PhysicsInfo(),
                     StreamInfo(),
                     VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
-                    Buffer(config),
+                    AstroNbodySim.Buffer(config),
                     bgforce, bgpotential,
                 )
             end
@@ -1015,7 +1015,7 @@ function Simulation(d;
                     PhysicsInfo(),
                     StreamInfo(),
                     VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
-                    Buffer(config),
+                    AstroNbodySim.Buffer(config),
                     bgforce, bgpotential,
                 )
             end
@@ -1052,7 +1052,7 @@ function Simulation(d;
                 Realtime = $Realtime, RenderTime = $RenderTime, resolution = $resolution,
                 xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
             ),
-            Buffer($config),
+            AstroNbodySim.Buffer($config),
             $bgforce, $bgpotential,
         )
 
@@ -1066,7 +1066,7 @@ function Simulation(d;
                 PhysicsInfo(),
                 StreamInfo(),
                 VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
-                Buffer(config),
+                AstroNbodySim.Buffer(config),
                 bgforce, bgpotential,
             )
         end
@@ -1092,7 +1092,7 @@ function Simulation(d;
             PhysicsInfo(),
             StreamInfo(),
             VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
-            Buffer(config),
+            AstroNbodySim.Buffer(config),
             bgforce, bgpotential,
         )
     elseif config.solver.grav isa ML

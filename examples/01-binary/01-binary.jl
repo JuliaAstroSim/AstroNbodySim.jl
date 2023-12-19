@@ -12,7 +12,7 @@ using Colors
 using CSV, DataFrames
 
 using Plots
-pyplot() # Need PyPlot to be installed
+# pyplot() # Need PyPlot to be installed
 
 using AstroNbodySim
 using PhysicalParticles

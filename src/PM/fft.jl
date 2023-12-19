@@ -1,3 +1,29 @@
+function fft_grid_kk(N, eps = 1e-6)
+    hx = 2π / (N + 1)
+    xx = Array{Float64}(undef, N + 1)
+    
+    # xx
+    N_2 = floor(Int, 0.5 * N)
+    for i in 1:N_2
+        xx[i +  1] = hx * i
+    end
+    
+    if isodd(N)
+        N_2 = floor(Int, 0.5*(N + 1))
+        for i in 1:N_2
+            @inbounds xx[i + N_2] = hx * (i - N_2 - 1)
+        end
+    else
+        N_2 = floor(Int, 0.5*(N + 1))
+        for i in 1:N_2
+            @inbounds xx[i + N_2 + 1] = hx * (i - N_2 - 1)
+        end
+    end
+    
+    xx[1] = eps # make sure that the denominator is not zero
+    return xx
+end
+
 function fft_poisson(config::MeshConfig, rho::AbstractArray{T,1}, boundary::Periodic) where T
     rho_bar = fft(rho)    
     rho_bar[1] *= 0.0
@@ -5,31 +31,7 @@ function fft_poisson(config::MeshConfig, rho::AbstractArray{T,1}, boundary::Peri
     delta2 = 2 ./ (ustrip.(config.Δ) .^ 2)
     delta2sum = - sum(delta2)
     
-    hx = 2 * pi / (config.Len[1] + 1)
-    
-    xx = Array{Float64}(undef, config.Len[1] + 1)
-    
-    # xx
-    N2 = floor(Int, 0.5*(config.Len[1]))
-    for i in 1:N2
-        xx[i +  1] = hx * i
-    end
-    
-    if isodd(config.Len[1])
-        N2 = floor(Int, 0.5*(config.Len[1] + 1))
-        for i in 1:N2
-            xx[i + N2] = hx * (i - N2 - 1)
-        end
-    else
-        N2 = floor(Int, 0.5*(config.Len[1] + 1))
-        for i in 1:N2
-            xx[i + N2 + 1] = hx * (i - N2 - 1)
-        end
-    end
-    
-    # make sure that the denominator is not zero
-    eps = 1.0e-6
-    xx[1] = eps
+    xx = fft_grid_kk(config.Len[1])
     
     # solve u_bar
     u_bar = similar(rho_bar);
@@ -47,52 +49,8 @@ function fft_poisson(config::MeshConfig, rho::AbstractArray{T,2}, boundary::Peri
     delta2 = 2 ./ (ustrip.(config.Δ) .^ 2)
     delta2sum = - sum(delta2)
     
-    hx = 2 * pi / (config.Len[1] + 1)
-    hy = 2 * pi / (config.Len[2] + 1)
-    
-    xx = Array{Float64}(undef, config.Len[1] + 1)
-    yy = Array{Float64}(undef, config.Len[2] + 1)
-    
-    # xx
-    N2 = floor(Int, 0.5*(config.Len[1]))
-    for i in 1:N2
-        xx[i +  1] = hx * i
-    end
-    
-    if isodd(config.Len[1])
-        N2 = floor(Int, 0.5*(config.Len[1] + 1))
-        for i in 1:N2
-            xx[i + N2] = hx * (i - N2 - 1)
-        end
-    else
-        N2 = floor(Int, 0.5*(config.Len[1] + 1))
-        for i in 1:N2
-            xx[i + N2 + 1] = hx * (i - N2 - 1)
-        end
-    end
-    
-    # yy
-    N2 = floor(Int, 0.5*(config.Len[2]))
-    for i in 1:N2
-        yy[i +  1] = hy * i
-    end
-    
-    if isodd(config.Len[2])
-        N2 = floor(Int, 0.5*(config.Len[2] + 1))
-        for i in 1:N2
-            yy[i + N2] = hy * (i - N2 - 1)
-        end
-    else
-        N2 = floor(Int, 0.5*(config.Len[2] + 1))
-        for i in 1:N2
-            yy[i + N2 + 1] = hy * (i - N2 - 1)
-        end
-    end
-    
-    # make sure that the denominator is not zero
-    eps = 1.0e-6
-    xx[1] = eps
-    yy[1] = eps
+    xx = fft_grid_kk(config.Len[1])
+    yy = fft_grid_kk(config.Len[2])
     
     # solve u_bar
     u_bar = similar(rho_bar);
@@ -112,73 +70,9 @@ function fft_poisson(config::MeshConfig, rho::AbstractArray{T,3}, boundary::Peri
     delta2 = 2 ./ (ustrip.(config.Δ) .^ 2)
     delta2sum = - sum(delta2)
     
-    hx = 2 * pi / (config.Len[1] + 1)
-    hy = 2 * pi / (config.Len[2] + 1)
-    hz = 2 * pi / (config.Len[3] + 1)
-    
-    xx = Array{Float64}(undef, config.Len[1] + 1)
-    yy = Array{Float64}(undef, config.Len[2] + 1)
-    zz = Array{Float64}(undef, config.Len[3] + 1)
-    
-    # xx
-    N2 = floor(Int, 0.5*(config.Len[1]))
-    for i in 1:N2
-        xx[i +  1] = hx * i
-    end
-    
-    if isodd(config.Len[1])
-        N2 = floor(Int, 0.5*(config.Len[1] + 1))
-        for i in 1:N2
-            xx[i + N2] = hx * (i - N2 - 1)
-        end
-    else
-        N2 = floor(Int, 0.5*(config.Len[1] + 1))
-        for i in 1:N2
-            xx[i + N2 + 1] = hx * (i - N2 - 1)
-        end
-    end
-    
-    # yy
-    N2 = floor(Int, 0.5*(config.Len[2]))
-    for i in 1:N2
-        yy[i +  1] = hy * i
-    end
-    
-    if isodd(config.Len[2])
-        N2 = floor(Int, 0.5*(config.Len[2] + 1))
-        for i in 1:N2
-            yy[i + N2] = hy * (i - N2 - 1)
-        end
-    else
-        N2 = floor(Int, 0.5*(config.Len[2] + 1))
-        for i in 1:N2
-            yy[i + N2 + 1] = hy * (i - N2 - 1)
-        end
-    end
-
-    # zz
-    N2 = floor(Int, 0.5*(config.Len[3]))
-    for i in 1:N2
-        zz[i +  1] = hz * i
-    end
-    
-    if isodd(config.Len[3])
-        N2 = floor(Int, 0.5*(config.Len[3] + 1))
-        for i in 1:N2
-            zz[i + N2] = hz * (i - N2 - 1)
-        end
-    else
-        N2 = floor(Int, 0.5*(config.Len[3] + 1))
-        for i in 1:N2
-            zz[i + N2 + 1] = hz * (i - N2 - 1)
-        end
-    end
-    
-    # make sure that the denominator is not zero
-    eps = 1.0e-6
-    xx[1] = eps
-    yy[1] = eps
-    zz[1] = eps
+    xx = fft_grid_kk(config.Len[1])
+    yy = fft_grid_kk(config.Len[2])
+    zz = fft_grid_kk(config.Len[3])
     
     # solve u_bar
     u_bar = similar(rho_bar);
