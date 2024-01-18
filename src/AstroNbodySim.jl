@@ -4,6 +4,7 @@ module AstroNbodySim
 __precompile__(true)
 
 using Reexport
+using PrecompileTools
 
 # basic
 using Dates

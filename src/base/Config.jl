@@ -580,15 +580,15 @@ end
 
 
 ##### LogInfo #####
-@enum DefaultTimer begin
-       TOTAL = 1
-       FORCE = 2
-       DRIFT = 3
-        KICK = 4
-    ANALYSIS = 5
-      OUTPUT = 6
-        PLOT = 7
-end
+DefaultTimer = Dict(
+       "TOTAL" => 1,
+       "FORCE" => 2,
+       "DRIFT" => 3,
+        "KICK" => 4,
+    "ANALYSIS" => 5,
+      "OUTPUT" => 6,
+        "PLOT" => 7,
+)
 
 """
 $(TYPEDEF)
@@ -603,7 +603,7 @@ Use uppercase letters to avoid
 """
 struct LogInfo
     "Timer enum names to access timing (continuously starting from 1)"
-    timers::Symbol
+    timers::Dict{String,Int}
     "Timings defined by timer enums"
     timing::Vector{UInt64}
     "Analyse on the whole simulation"
@@ -614,10 +614,10 @@ end
 $(TYPEDSIGNATURES)
 """
 function LogInfo(;
-        timers = :DefaultTimer,
+        timers = DefaultTimer,
         analysers = Dict{String, Function}(),
     )
-    timing = [UInt64(0) for i in instances(eval(timers))]
+    timing = [UInt64(0) for i in eachindex(timers)]
     return LogInfo(timers, timing, analysers)
 end
 
@@ -906,7 +906,7 @@ function Simulation(d;
     pids = [1],
 
     # LogInfo
-    timers = :DefaultTimer,
+    timers = DefaultTimer,
     analysers = Dict{String, Function}(),
 
     # VisualizationInfo
@@ -976,7 +976,7 @@ function Simulation(d;
                         $config, $id, $pids, $simdata,
                         TimeInfo($config),
                         OutputInfo(),
-                        LogInfo(; timers = Symbol($timers), analysers = $analysers),
+                        LogInfo(; timers = $timers, analysers = $analysers),
                         PhysicsInfo(),
                         StreamInfo(),
                         VisualizationInfo(;
@@ -1045,7 +1045,7 @@ function Simulation(d;
             OctreeData($treesimconfig, AstroNbodySim.PhysicalTrees.registry[$(tree.id)]),
             TimeInfo($config),
             OutputInfo(),
-            LogInfo(; timers = Symbol($timers), analysers = $analysers),
+            LogInfo(; timers = $timers, analysers = $analysers),
             PhysicsInfo(),
             StreamInfo(),
             VisualizationInfo(;

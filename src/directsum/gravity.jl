@@ -165,7 +165,7 @@ function compute_force(sim::Simulation, GravSolver::DirectSum, Device::CPU)
     bcast(sim, send_force_result_buffer)
     bcast(sim, combine_force, args = (GravSolver, Device))
     bcast(sim, postprocessing_force, args = (GravSolver, Device))
-    add_timer(sim, FORCE, t_FORCE, time_ns())
+    add_timer(sim, "FORCE", t_FORCE, time_ns())
 end
 
 function compute_local_force_at_points(sim::Simulation, SoftLength::Number, GravSolver::DirectSum, Device::CPU)

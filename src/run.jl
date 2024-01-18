@@ -11,8 +11,7 @@ function preprocessdata(sim::Simulation, ::DirectSum, ::GPU)
 end
 
 """
-    function run(sim::Simulation)
-
+$TYPEDSIGNATURES
 This function does all the work for you:
 1. `prepare` sim environment and preprocess data
 2. evaluate force, initialize timesteps, output
@@ -74,13 +73,13 @@ function run(sim::Simulation)
     NextSaveRestart = TimeBetweenRestarts
     state = true
     while state
-        t_TOTAL = begin_timer(sim, TOTAL)
-        begin_timer(sim, FORCE)
-        begin_timer(sim, DRIFT)
-        begin_timer(sim, KICK)
-        begin_timer(sim, ANALYSIS)
-        begin_timer(sim, OUTPUT)
-        begin_timer(sim, PLOT)
+        t_TOTAL = begin_timer(sim, "TOTAL")
+        begin_timer(sim, "FORCE")
+        begin_timer(sim, "DRIFT")
+        begin_timer(sim, "KICK")
+        begin_timer(sim, "ANALYSIS")
+        begin_timer(sim, "OUTPUT")
+        begin_timer(sim, "PLOT")
         
         # force computation, time integration, logging of various types of simulation
         step(sim, GravSolver, Device) 
@@ -90,13 +89,13 @@ function run(sim::Simulation)
         if !isempty(sim.loginfo.analysers)
             push!(analysis, write_analysis(sim))
         end
-        add_timer(sim, ANALYSIS, t_ANALYSIS, time_ns())
+        add_timer(sim, "ANALYSIS", t_ANALYSIS, time_ns())
         
         # Plot
         if sim.visinfo.Realtime && time() - sim.visinfo.last_plot_time > sim.visinfo.RenderTime
             t_PLOT = time_ns()
             update_makie_plot(sim, GravSolver, Device)
-            add_timer(sim, PLOT, t_PLOT, time_ns())
+            add_timer(sim, "PLOT", t_PLOT, time_ns())
         end
 
         # save restart
@@ -128,7 +127,7 @@ function run(sim::Simulation)
         timeinfo.stepcount += 1
         timeinfo.last_system_time_float = timeinfo.system_time_float
 
-        add_timer(sim, TOTAL, t_TOTAL, time_ns())
+        add_timer(sim, "TOTAL", t_TOTAL, time_ns())
         write_timing(sim)
     end
 
