@@ -63,7 +63,7 @@ function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::CoarseMesh)
     #TODO background force
 
     if sim.config.grav.model isa QUMOND
-        QUMOND(coarsemesh, ACC0, G)
+        QUMOND_acc!(coarsemesh, ACC0, G)
     end
 
     # Assign outbound particles

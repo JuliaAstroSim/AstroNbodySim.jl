@@ -44,7 +44,7 @@ using GLMakie
 using LoopVectorization
 
 # Machine Learning
-using Knet
+# using Knet
 using Images
 using Zygote
 
@@ -140,9 +140,9 @@ export
     fdm_poisson,
 
     # ML
-    train_cnn_poisson2d,
-    train_cnn_poisson3d,
-    cnn_poisson,
+    # train_cnn_poisson2d,
+    # train_cnn_poisson3d,
+    # cnn_poisson,
 
     # Timestep
     ConstantTimestep, AdaptiveTimestep,
@@ -168,8 +168,7 @@ export
     mond_Milgrom1983,
     QUMOND_PDM_density,
     QUMOND_phi,
-    QUMOND_acc,
-    QUMOND,
+    QUMOND_acc, QUMOND_acc!,
 
     # Tools
     write_gadget2_makefile,
@@ -254,9 +253,9 @@ include("PM/cnn.jl")
 include("PM/output.jl")
 include("PM/timestep.jl")
 
-include("ML/cnn-poisson/models.jl")
-include("ML/cnn-poisson/dataset.jl")
-include("ML/cnn-poisson/train.jl")
+# include("ML/cnn-poisson/models.jl")
+# include("ML/cnn-poisson/dataset.jl")
+# include("ML/cnn-poisson/train.jl")
 
 include("restart.jl")
 include("run.jl")
@@ -272,4 +271,6 @@ include("tools/gadget2/makefile.jl")
 include("tools/gadget2/param.jl")
 
 include("main.jl")
+
+include("precompile.jl")
 end

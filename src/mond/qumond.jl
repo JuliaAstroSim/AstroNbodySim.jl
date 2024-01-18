@@ -139,7 +139,7 @@ end
 
 Apply QUMOND (QUasi-linear MOdified Newtonian Dynamics) formula to accelerations
 """
-function QUMOND(m::MeshCartesianStatic, ACC0::Number, G::Number, Device::DeviceType, sparse::Bool)
+function QUMOND_acc!(m::MeshCartesianStatic, ACC0::Number, G::Number, Device::DeviceType, sparse::Bool)
     config = m.config
     phi_PDM = QUMOND_phi(m, ACC0, G, Device, sparse)
     m.acc.x .-= diff_central_x(config.Δ[1], phi_PDM)

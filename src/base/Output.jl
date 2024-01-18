@@ -1,6 +1,6 @@
 
 
-function count_gadget_types(all_data::StructArray) where T<:AbstractParticle
+function count_gadget_types(all_data::StructArray)
     Counts = MVector{6,Int32}([0,0,0,0,0,0])
     for p in all_data.Collection
         Counts[Int(p)] += 1
@@ -8,7 +8,7 @@ function count_gadget_types(all_data::StructArray) where T<:AbstractParticle
     return Counts
 end
 
-function HeaderGadget2(sim::Simulation, all_data::StructArray) where T<:AbstractParticle
+function HeaderGadget2(sim::Simulation, all_data::StructArray)
     Counts = count_gadget_types(all_data)
     return HeaderGadget2(
         Counts,
