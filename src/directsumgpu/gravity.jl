@@ -82,5 +82,5 @@ function compute_force(sim::Simulation, GravSolver::DirectSum, Device::GPU)
     t_FORCE = time_ns()
     compute_force(sim, sim.config.device.GPU_Algorithm)
     postprocessing_force(sim, GravSolver, Device)
-    add_timer(sim, FORCE, t_FORCE, time_ns())
+    add_timer(sim, "FORCE", t_FORCE, time_ns())
 end

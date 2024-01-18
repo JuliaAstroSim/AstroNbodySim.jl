@@ -200,18 +200,18 @@ function find_next_sync_point_and_drift(sim::Simulation, TimestepConfig::Constan
     while sim.timeinfo.next_output_time_float <= next_system_time
         t_DRIFT = time_ns()
         drift_particles_const_timestep(sim, sim.timeinfo.next_output_time_float, GravSolver, Device)
-        add_timer(sim, DRIFT, t_DRIFT, time_ns())
+        add_timer(sim, "DRIFT", t_DRIFT, time_ns())
 
         t_OUTPUT = time_ns()
         sim.config.output.func(sim, sim.config.output.type)
-        add_timer(sim, OUTPUT, t_OUTPUT, time_ns())
+        add_timer(sim, "OUTPUT", t_OUTPUT, time_ns())
 
         sim.timeinfo.next_output_time_float += sim.config.time.BetweenSnapshots
     end
 
     t_DRIFT = time_ns()
     drift_particles_const_timestep(sim, next_system_time, GravSolver, Device)
-    add_timer(sim, DRIFT, t_DRIFT, time_ns())
+    add_timer(sim, "DRIFT", t_DRIFT, time_ns())
 end
 
 function find_min_endstep(sim::Simulation, GravSolver::Gravity, Device::CPU)
@@ -225,21 +225,21 @@ function find_next_sync_point_and_drift(sim::Simulation, TimestepConfig::Adaptiv
     t_DRIFT = time_ns()
     min_endstep = find_min_endstep(sim, GravSolver, Device)
     check_sync_point(sim, GravSolver, Device)
-    add_timer(sim, DRIFT, t_DRIFT, time_ns())
+    add_timer(sim, "DRIFT", t_DRIFT, time_ns())
 
     while sim.timeinfo.next_output_time_int <= min_endstep
         t_DRIFT = time_ns()
         drift_particles_adaptive_timestep(sim, sim.timeinfo.next_output_time_int, GravSolver, Device)
-        add_timer(sim, DRIFT, t_DRIFT, time_ns())
+        add_timer(sim, "DRIFT", t_DRIFT, time_ns())
 
         t_OUTPUT = time_ns()
         sim.config.output.func(sim, sim.config.output.type)
-        add_timer(sim, OUTPUT, t_OUTPUT, time_ns())
+        add_timer(sim, "OUTPUT", t_OUTPUT, time_ns())
 
         sim.timeinfo.next_output_time_int += sim.config.time.BetweenSnapshotsInt
     end
 
     t_DRIFT = time_ns()
     drift_particles_adaptive_timestep(sim, min_endstep, GravSolver, Device)
-    add_timer(sim, DRIFT, t_DRIFT, time_ns())
+    add_timer(sim, "DRIFT", t_DRIFT, time_ns())
 end

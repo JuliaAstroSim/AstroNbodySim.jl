@@ -72,7 +72,7 @@ function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT}, Device::Dev
         end
     end
 
-    add_timer(sim, FORCE, t_FORCE, time_ns())
+    add_timer(sim, "FORCE", t_FORCE, time_ns())
 end
 
 function compute_force(sim::Simulation, pos::Union{Array{T,1}, T}, SoftLength::Number, GravSolver::Union{FFT,FDM}, Device::CPU) where T<:AbstractPoint3D

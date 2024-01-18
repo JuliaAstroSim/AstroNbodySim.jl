@@ -7,7 +7,7 @@ function setuploggers(sim::Simulation)
 
     if !isempty(loginfo.timing)
         stream.timerio = open(joinpath(config.output.dir, "timing.csv"), "w")
-        write(stream.timerio, join(["time"; string.(instances(eval(loginfo.timers)))...], ",") * "\n")
+        write(stream.timerio, join(["time"; string.(keys(loginfo.timers))...], ",") * "\n")
     end
 
     if !isempty(loginfo.analysers)
