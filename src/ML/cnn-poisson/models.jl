@@ -1,3 +1,12 @@
+using Knet
+using CUDA
+using PhysicalFDM
+using Printf
+using GLMakie
+using ProgressMeter
+using Images
+
+
 struct Chain
     layers
 end

@@ -64,6 +64,11 @@ function run(sim::Simulation)
     # Save initial conditions
     sim.config.output.func(sim, sim.config.output.type)
 
+    # Analysers
+    if !isempty(sim.loginfo.analysers)
+        analysis = []
+    end
+
     # Main loop
     TimeBetweenRestarts = config.output.SaveRestartFreq * (config.time.End - config.time.Begin)
     NextSaveRestart = TimeBetweenRestarts
@@ -82,7 +87,9 @@ function run(sim::Simulation)
 
         # Do whatever you want with the entire data of simulation !!!
         t_ANALYSIS = time_ns()
-        write_analysis(sim)
+        if !isempty(sim.loginfo.analysers)
+            push!(analysis, write_analysis(sim))
+        end
         add_timer(sim, ANALYSIS, t_ANALYSIS, time_ns())
         
         # Plot
@@ -135,6 +142,10 @@ function run(sim::Simulation)
     println()
     println()
     #@info "Simulation finished"
+
+    if !isempty(sim.loginfo.analysers)
+        return collect(hcat(analysis...)')
+    end
 end
 
 function restart(sim::Simulation)

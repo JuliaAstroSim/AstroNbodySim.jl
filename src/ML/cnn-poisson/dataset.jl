@@ -1,5 +1,5 @@
-const Atype = KnetArray{Float32}
-#const Atype = CuArray{Float32}
+# const Atype = KnetArray{Float32}
+const Atype = CuArray{Float32}
 
 function laplace_conv(a, Δ...)
     kernel = laplace_conv_op(Δ...)
@@ -74,26 +74,14 @@ function laplacian_DataGenerate(data_nums,data_size;atype=Atype)
     return convert.(atype,(y,x))
 end
 
-
-function make_minibatch(X, Y, idxs)
-    X_batch = Atype(undef,size(X[:,:,:,1])..., length(idxs))
-    for i in 1:length(idxs)
-        X_batch[:,:,:,i] = X[:,:,:,idxs[i]]
-    end
-    Y_batch = Atype(undef,size(Y[:,:,:,1])..., length(idxs))
-    for i in 1:length(idxs)
-        Y_batch[:,:,:,i] = Y[:,:,:,idxs[i]]
-    end
-    return(X_batch, Y_batch)
-end
-
 function Dataset(data_nums,data_size,batch_size)
     X,Y = laplacian_DataGenerate(data_nums,data_size)
-    mb_idxs = collect(partition(1:data_nums, batch_size))
-    x,y=[],[]
-    for i in mb_idxs
-        append!(x, [make_minibatch(X, Y, i)[1]])
-        append!(y, [make_minibatch(X, Y, i)[2]])
+    mb_idxs = collect(Iterators.partition(1:data_nums, batch_size))
+    x=[]
+    y=[]
+    for i in mb_idxs # minibatch
+        append!(x, [X[:,:,:,i]])
+        append!(y, [Y[:,:,:,i]])
     end
     return (x,y)
 end
