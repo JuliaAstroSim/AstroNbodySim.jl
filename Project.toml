@@ -1,7 +1,7 @@
 name = "AstroNbodySim"
 uuid = "034523a5-eae8-49f5-9052-0ea364535333"
 authors = ["islent <leoislent@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 AstroIO = "c85a633c-0c3f-44a2-bffe-7f9d0681b3e7"
@@ -45,9 +45,10 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
 AstroIO = "0.1"
+AstroSimBase = "0.1"
 BangBang = "0.3"
 CSV = "0.9, 0.10"
-CUDA = "3, 4, 5"
+CUDA = "4, 5"
 DataFrames = "1"
 DocStringExtensions = "0.8, 0.9"
 FFTW = "1"
@@ -60,6 +61,7 @@ Measurements = "2"
 OffsetArrays = "1"
 PaddedViews = "0.5"
 ParallelOperations = "0.1"
+PhysicalFDM = "0.1"
 PhysicalMeshes = "0.1"
 PhysicalParticles = "1"
 PhysicalTrees = "0.1"
