@@ -24,7 +24,7 @@ function fft_grid_kk(N, eps = 1e-6)
     return xx
 end
 
-function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Periodic) where T
+function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Periodic, Device::CPU) where T
     rho_bar = fft(rho)    
     rho_bar[1] *= 0.0
     
@@ -36,15 +36,28 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Periodic) where
     # solve u_bar
     u_bar = similar(rho_bar);
     for i in 1:Len[1]+1
-        u_bar[i] = rho_bar[i] / (delta2sum + delta2[1] * cos(xx[i]))
+        @inbounds u_bar[i] = rho_bar[i] / (delta2sum + delta2[1] * cos(xx[i]))
     end
     
     u = real(ifft(u_bar))
 end
 
-### Periodic boundary conditions
-function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Periodic) where T
+function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Periodic, Device::GPU) where T
     rho_bar = fft(rho)    
+    CUDA.@allowscalar rho_bar[1] *= 0.0
+    
+    delta2 = 2 ./ (ustrip.(Δ) .^ 2)
+    delta2sum = - sum(delta2)
+    
+    xx = fft_grid_kk(Len[1])
+    
+    u_bar = rho_bar ./ (delta2sum .+ delta2[1] * cos.(CuArray(xx * ones(Len[2]+1)')))
+    
+    u = real(ifft(u_bar))
+end
+
+function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Periodic, Device::CPU) where T
+    rho_bar = fft(rho)
     rho_bar[1] *= 0.0
     
     delta2 = 2 ./ (ustrip.(Δ) .^ 2)
@@ -57,14 +70,30 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Periodic) where
     u_bar = similar(rho_bar);
     for j in 1:Len[2]+1
         for i in 1:Len[1]+1
-            u_bar[i,j] = rho_bar[i,j] / (delta2sum + delta2[1] * cos(xx[i]) + delta2[2] * cos(yy[j]))
+            @inbounds u_bar[i,j] = rho_bar[i,j] / (delta2sum + delta2[1] * cos(xx[i]) + delta2[2] * cos(yy[j]))
         end
     end
     
     u = real(ifft(u_bar))
 end
 
-function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Periodic) where T
+function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Periodic, Device::GPU) where T
+    rho_bar = fft(rho)
+    CUDA.@allowscalar rho_bar[1] *= 0.0
+    
+    delta2 = 2 ./ (ustrip.(Δ) .^ 2)
+    delta2sum = - sum(delta2)
+    
+    xx = fft_grid_kk(Len[1])
+    yy = fft_grid_kk(Len[2])
+    
+    # solve u_bar
+    u_bar = rho_bar ./ (delta2sum .+ delta2[1] * cos.(CuArray(xx * ones(Len[2]+1)')) + delta2[2] * cos.(CuArray(ones(Len[1]+1) * yy')))
+    
+    u = real(ifft(u_bar))
+end
+
+function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Periodic, Device::CPU) where T
     rho_bar = fft(rho)    
     rho_bar[1] *= 0.0
     
@@ -80,7 +109,7 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Periodic) where
     for k in 1:Len[3]+1
         for j in 1:Len[2]+1
             for i in 1:Len[1]+1
-                u_bar[i,j,k] = rho_bar[i,j,k] / (delta2sum + delta2[1] * cos(xx[i]) + delta2[2] * cos(yy[j]) + delta2[3] * cos(zz[k]))
+                @inbounds u_bar[i,j,k] = rho_bar[i,j,k] / (delta2sum + delta2[1] * cos(xx[i]) + delta2[2] * cos(yy[j]) + delta2[3] * cos(zz[k]))
             end
         end
     end
@@ -88,8 +117,29 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Periodic) where
     u = real(ifft(u_bar))
 end
 
+function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Periodic, Device::GPU) where T
+    rho_bar = fft(rho)    
+    CUDA.@allowscalar rho_bar[1] *= 0.0
+    
+    delta2 = 2 ./ (ustrip.(Δ) .^ 2)
+    delta2sum = - sum(delta2)
+    
+    xx = fft_grid_kk(Len[1])
+    yy = fft_grid_kk(Len[2])
+    zz = fft_grid_kk(Len[3])
+    
+    oneMatrix = cu(ones((Len.+1)...))
+    dcx = delta2[1] .* cos.(oneMatrix .* cu(xx))
+    dcy = delta2[2] .* cos.(oneMatrix .* cu(yy'))
+    dcz = delta2[3] .* cos.(oneMatrix .* cu(reshape(zz, 1, 1, Len[3]+1)))
+    u_bar = rho_bar ./ (delta2sum .+ dcx .+ dcy .+ dcz)
+    CUDA.@allowscalar u_bar[1] = 0.0f0+0.0f0*im
+    
+    u = real(ifft(u_bar))
+end
+
 ### Homogeneous Dirichlet boundary conditions - fast sine transform
-function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Dirichlet) where T
+function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Dirichlet, Device::CPU) where T
     #rho_bar = fft(mesh.rho)
     #rho_bar[1] *= 0.0
     rho_bar = FFTW.r2r(complex(rho[2:end]), FFTW.RODFT00)
@@ -102,14 +152,14 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,1}, boundary::Dirichlet) wher
     # solve u_bar
     u_bar = similar(rho_bar);
     for i in 1:Len[1]
-        u_bar[i] = rho_bar[i] / (delta2sum + delta2[1] * cos(hx * i))
+        @inbounds u_bar[i] = rho_bar[i] / (delta2sum + delta2[1] * cos(hx * i))
     end
 
     u = real(FFTW.r2r(u_bar, FFTW.RODFT00)/((2*(Len[1] + 1))))
     #mesh.phi .= real(ifft(u_bar))
 end
 
-function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Dirichlet) where T
+function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Dirichlet, Device::CPU) where T
     #rho_bar = fft(mesh.rho)
     #rho_bar[1] *= 0.0
     rho_bar = FFTW.r2r(complex(rho[2:end, 2:end]), FFTW.RODFT00)
@@ -124,7 +174,7 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Dirichlet) wher
     u_bar = similar(rho_bar);
     for j in 1:Len[2]
         for i in 1:Len[1]
-            u_bar[i,j] = rho_bar[i,j] / (delta2sum + delta2[1] * cos(hx * i) + delta2[2] * cos(hy * j))
+            @inbounds u_bar[i,j] = rho_bar[i,j] / (delta2sum + delta2[1] * cos(hx * i) + delta2[2] * cos(hy * j))
         end
     end
 
@@ -132,7 +182,7 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,2}, boundary::Dirichlet) wher
     #mesh.phi .= real(ifft(u_bar))
 end
 
-function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Dirichlet) where T
+function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Dirichlet, Device::CPU) where T
     #rho_bar = fft(mesh.rho)
     #rho_bar[1] *= 0.0
     rho_bar = FFTW.r2r(complex(rho[2:end, 2:end, 2:end]), FFTW.RODFT00)
@@ -149,7 +199,7 @@ function fft_poisson(Δ, Len, rho::AbstractArray{T,3}, boundary::Dirichlet) wher
     for k in 1:Len[3]
         for j in 1:Len[2]
             for i in 1:Len[1]
-                u_bar[i,j,k] = rho_bar[i,j,k] / (delta2sum + delta2[1] * cos(hx * i) + delta2[2] * cos(hy * j) + delta2[3] * cos(hz * k))
+                @inbounds u_bar[i,j,k] = rho_bar[i,j,k] / (delta2sum + delta2[1] * cos(hx * i) + delta2[2] * cos(hy * j) + delta2[3] * cos(hz * k))
             end
         end
     end
@@ -183,19 +233,19 @@ end
 
 # Dirichlet BC returns a smaller array
 function fft_poisson!(m::MeshCartesianStatic, rho::AbstractArray, boundary::Periodic)
-    m.phi .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary) .* unit(eltype(m.phi))
+    m.phi .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary, m.config.device) .* unit(eltype(m.phi))
 end
 
 function fft_poisson!(m::MeshCartesianStatic, rho::AbstractArray{T,1}, boundary::Dirichlet) where T
-    m.phi[2:end] .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary) .* unit(eltype(m.phi))
+    m.phi[2:end] .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary, m.config.device) .* unit(eltype(m.phi))
 end
 
 function fft_poisson!(m::MeshCartesianStatic, rho::AbstractArray{T,2}, boundary::Dirichlet) where T
-    m.phi[2:end,2:end] .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary) .* unit(eltype(m.phi))
+    m.phi[2:end,2:end] .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary, m.config.device) .* unit(eltype(m.phi))
 end
 
 function fft_poisson!(m::MeshCartesianStatic, rho::AbstractArray{T,3}, boundary::Dirichlet) where T
-    m.phi[2:end,2:end,2:end] .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary) .* unit(eltype(m.phi))
+    m.phi[2:end,2:end,2:end] .= fft_poisson(m.config.Δ, m.config.Len, rho, boundary, m.config.device) .* unit(eltype(m.phi))
 end
 
 function fft_poisson(m::AbstractMesh, G::Number)

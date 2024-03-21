@@ -440,7 +440,7 @@ end
                 NG = 0,
                 dim = 1,
                 boundary,
-                gpu = device isa GPU ? true : false,
+                device,
             )
             m.rho .= init_rho.(m.pos)
             fdm_poisson(m, Val(1), 1/(4*pi), m.config.mode, device, boundary, sparse)
@@ -552,7 +552,7 @@ end
                 NG = 0,
                 dim = 2,
                 boundary,
-                gpu = device isa GPU ? true : false,
+                device,
             )
             m.rho .= init_rho.(m.pos)
             fdm_poisson(m, Val(2), 1/(4*pi), m.config.mode, device, boundary, sparse)
@@ -621,7 +621,7 @@ end
                 NG = 0,
                 dim = 3,
                 boundary,
-                gpu = device isa GPU ? true : false,
+                device,
             )
             m.rho .= init_rho.(m.pos)
             fdm_poisson(m, Val(3), 1/(4*pi), m.config.mode, device, boundary, sparse)

@@ -1080,7 +1080,7 @@ function Simulation(d;
             Nx, Ny, Nz, NG,
             xMin, xMax, yMin, yMax, zMin, zMax,
             mode = meshmode,
-            gpu = device isa GPU ? true : false,
+            device,
             enlarge = EnlargeMesh,
         )
         registry[id] = Simulation(

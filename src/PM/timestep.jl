@@ -48,7 +48,7 @@ function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::CoarseMesh)
         Ny = 10,
         Nz = 10,
         assign = true,
-        gpu = device isa GPU ? true : false,
+        device,
         enlarge = 1.2,
     )
 
