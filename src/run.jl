@@ -10,6 +10,28 @@ function preprocessdata(sim::Simulation, ::DirectSum, ::GPU)
     preferunits(sim.config.units)
 end
 
+function preprocessdata(sim::Simulation, ::ML, ::DeviceType)
+    sim.config.solver.data.u = UnitProjection(sim.simdata)
+
+    if isempty(sim.config.solver.data.tstate.model.layers)
+        error("Calling ML solver without model defined (`config.solver.data.model`)")
+    else
+        if isnothing(sim.config.solver.data.best_parameters)
+            @info "Calling ML solver without trained model. Train a new model?"
+            str = Base.prompt("[Y]/N?") in ("","y","Y") ? "Y" : "N"
+            println("Got input: $str")
+            if str == "Y"
+                @info "Training a new model:"
+                println(sim.config.solver.data.model)
+
+                #TODO
+            else
+                error("Canceled by user.")
+            end
+        end
+    end
+end
+
 """
 $TYPEDSIGNATURES
 This function does all the work for you:

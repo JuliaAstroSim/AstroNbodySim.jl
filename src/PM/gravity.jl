@@ -14,7 +14,11 @@ function compute_acc(m::MeshCartesianStatic, dim::Val{3}, mode::VertexMode)
     return nothing
 end
 
-function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT}, Device::DeviceType)
+function compute_acc(m::MeshCartesianStatic)
+    compute_acc(m, Val(m.config.dim), m.config.mode)
+end
+
+function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT, ML}, Device::DeviceType)
     t_FORCE = time_ns()
 
     G = sim.config.constants.G
@@ -26,9 +30,11 @@ function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT}, Device::Dev
         fdm_poisson(m, Val(m.config.dim), G, m.config.mode, Device, m.config.boundary, sim.config.grav.sparse)
     elseif GravSolver isa FFT
         fft_poisson(m, G)
+    elseif GravSolver isa ML
+        cnn_poisson(m, sim.config.solver.data.u, sim.config.solver.data)
     end
     
-    compute_acc(m, Val(m.config.dim), m.config.mode)
+    compute_acc(m)
 
     #TODO background force
 
