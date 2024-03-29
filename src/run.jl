@@ -10,7 +10,7 @@ function preprocessdata(sim::Simulation, ::DirectSum, ::GPU)
     preferunits(sim.config.units)
 end
 
-function preprocessdata(sim::Simulation, ::ML, ::DeviceType)
+function preprocessdata(sim::Simulation, ::ML, ::GPU)
     sim.config.solver.data.u = UnitProjection(sim.simdata)
 
     if isempty(sim.config.solver.data.tstate.model.layers)
@@ -30,6 +30,10 @@ function preprocessdata(sim::Simulation, ::ML, ::DeviceType)
             end
         end
     end
+end
+
+function preprocessdata(sim::Simulation, ::ML, ::CPU)
+    @warn "ML model on CPU is not encouraged! Try use keyword `device = GPU()`"
 end
 
 """

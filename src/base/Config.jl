@@ -194,6 +194,41 @@ end
 
 ##### SolverConfig #####
 
+struct UnitProjection
+    L
+    T
+    G
+    M
+end
+
+"""
+Construct without initialization
+"""
+function UnitProjection(units)
+    return UnitProjection(
+        1.0*getuLength(units),
+        1.0*getuTime(units),
+        1.0,
+        1.0*getuMass(units),
+    )
+end
+
+function UnitProjection(m::MeshCartesianStatic)
+    L = m.config.Max[1] - m.config.Min[1]
+    T = 10.0*getuTime(m.config.units)
+    G = 1.0
+    M = G * L^3 / G / T^2
+    return UnitProjection(L, T, G, M)
+end
+
+mutable struct DataML
+    u::UnitProjection
+    tstate
+    best_parameters
+    dev_cpu
+    dev_gpu
+end
+
 """
 $(TYPEDEF)
 
@@ -204,6 +239,9 @@ struct SolverConfig{SolverG #=, SolverH=#}
     grav::SolverG
     #"Hydrodynamical force solver. Supported: `SPH`, `MHD`, `FEM`, `FVM`"
     #hydro::SolverH
+
+    "Data specialized for the solver"
+    data
 end
 
 """
@@ -215,9 +253,11 @@ function SolverConfig(;
 
     # Keywords to override
     grav::Gravity = GravitySolver,
+    data = nothing,
 )
     return SolverConfig(
         grav,
+        data,
     )
 end
 
@@ -528,8 +568,30 @@ function SimConfig( ;
     EnlargeMesh::Float64 = 2.01,
     BoundaryCondition::BoundaryCondition = Vacuum(),
     sparse::Bool = true,
-)
     
+    # ML
+    cnn_model = nothing,
+    cnn_parameters = nothing,
+    learning_rate = 0.001f0,
+    optimiser = Optimisers.Adam,
+    solverdata = nothing,
+)
+    # Construct here and initialize in Simulation
+    if GravitySolver isa ML
+        if !isnothing(cnn_model)
+            model = cnn_model
+        else
+            model = Chain()
+        end
+        opt = optimiser(learning_rate)
+        tstate = Lux.Experimental.TrainState(MersenneTwister(), model, opt)
+
+        if !isnothing(cnn_parameters)
+            tstate = setproperties!!(tstate, parameters = cnn_parameters)
+        end
+        solverdata = DataML(UnitProjection(units), tstate, cpu_device(), cnn_parameters, gpu_device())
+    end
+
     return SimConfig(
         name, author, daytime,
         floattype,
@@ -546,6 +608,7 @@ function SimConfig( ;
         ),
         SolverConfig(;
             GravitySolver,
+            data = solverdata,
         ),
         GravityConfig(;
             ForceSofteningTable = MVector{length(ForceSofteningTable)}(ForceSofteningTable),
@@ -1071,7 +1134,7 @@ function Simulation(d;
             )
         end
         @info "Data cuts: " * string(gather(registry[id], numlocal))
-    elseif config.solver.grav isa FDM || config.solver.grav isa FFT
+    elseif config.solver.grav isa FDM || config.solver.grav isa FFT || config.solver.grav isa ML
         @info "Setting up $(traitstring(config.solver.grav)) simulation..."
         dStruct = StructArray(d)
         mesh = MeshCartesianStatic(dStruct, units;
@@ -1083,6 +1146,9 @@ function Simulation(d;
             device,
             enlarge = EnlargeMesh,
         )
+        if config.solver.grav isa ML
+            config.solver.data.u = UnitProjection(mesh)
+        end
         registry[id] = Simulation(
             config, id, pids,
             mesh,
@@ -1121,7 +1187,7 @@ function get_local_data(sim::Simulation, ::Tree, ::CPU)
     return sim.simdata.tree.data
 end
 
-function get_local_data(sim::Simulation, ::Union{FDM, FFT}, ::DeviceType)
+function get_local_data(sim::Simulation, ::Union{FDM, FFT, ML}, ::DeviceType)
     return sim.simdata.data
 end
 

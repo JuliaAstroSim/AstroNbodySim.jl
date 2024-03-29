@@ -40,7 +40,7 @@ function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT, ML}, Device:
 
     # Solve QUMOND on mesh
     if sim.config.grav.model isa QUMOND
-        QUMOND_acc!(m, ACC0, G, Device, sim.config.grav.sparse)
+        QUMOND_acc!(m, ACC0, G)
     end
 
     # Assign acc to inbound particles

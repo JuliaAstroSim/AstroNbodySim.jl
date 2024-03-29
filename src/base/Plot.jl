@@ -4,7 +4,7 @@ function pack_pos(sim::Simulation, ::DirectSum, ::GPU)
     return pack_xyz(d)
 end
 
-function pack_pos(sim::Simulation, ::Union{DirectSum, Tree, FFT, FDM}, ::CPU)
+function pack_pos(sim::Simulation, ::Union{DirectSum, Tree, FFT, FDM, ML}, ::CPU)
     uLength = getuLength(sim.config.units)
     d = StructArray(ustrip.(uLength, get_all_data(sim).Pos))
     return pack_xyz(d)
