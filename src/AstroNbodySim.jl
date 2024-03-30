@@ -3,7 +3,7 @@ module AstroNbodySim
 
 __precompile__(true)
 
-using Reexport
+# using Reexport
 using PrecompileTools
 
 # basic
@@ -55,13 +55,13 @@ using Zygote
 
 # JuliaAstroSim
 using ParallelOperations
-@reexport using AstroSimBase
-@reexport using PhysicalParticles
-@reexport using PhysicalMeshes
-@reexport using PhysicalTrees
-@reexport using AstroIO
-@reexport using PhysicalFDM
-@reexport using PhysicalFFT
+using AstroSimBase
+using PhysicalParticles
+using PhysicalMeshes
+using PhysicalTrees
+using AstroIO
+using PhysicalFDM
+using PhysicalFFT
 using PhysicalParticles.NumericalIntegration
 
 # GPU
@@ -255,7 +255,6 @@ include("directsumgpu/gravity.jl")
 include("directsumgpu/timestep.jl")
 
 include("PM/gravity.jl")
-include("PM/fft.jl")
 include("PM/output.jl")
 include("PM/timestep.jl")
 

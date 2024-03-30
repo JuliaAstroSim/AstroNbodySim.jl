@@ -208,16 +208,16 @@ function UnitProjection(units)
     return UnitProjection(
         1.0*getuLength(units),
         1.0*getuTime(units),
-        1.0,
+        1.0*getuLength(units)^3 / getuMass(units) / getuTime(units)^2,
         1.0*getuMass(units),
     )
 end
 
 function UnitProjection(m::MeshCartesianStatic)
     L = m.config.Max[1] - m.config.Min[1]
-    T = 10.0*getuTime(m.config.units)
-    G = 1.0
-    M = G * L^3 / G / T^2
+    M = mean(m.rho) * L^m.config.dim
+    G = Constant(m.config.units).G
+    T = sqrt(L^3 / (4π*G*M))
     return UnitProjection(L, T, G, M)
 end
 
@@ -587,7 +587,7 @@ function SimConfig( ;
         tstate = Lux.Experimental.TrainState(MersenneTwister(), model, opt)
 
         if !isnothing(cnn_parameters)
-            tstate = setproperties!!(tstate, parameters = cnn_parameters)
+            tstate = setproperties!!(tstate, parameters = gpu_device()(cnn_parameters))
         end
         solverdata = DataML(UnitProjection(units), tstate, cpu_device(), cnn_parameters, gpu_device())
     end
@@ -1018,6 +1018,7 @@ function Simulation(d;
     zMin = nothing,
     zMax = nothing,
     device = CPU(),
+    data_on_cpu = false,
     EnlargeMesh = 2.01,
     BoundaryCondition = Vacuum(),
 
@@ -1143,7 +1144,7 @@ function Simulation(d;
             Nx, Ny, Nz, NG,
             xMin, xMax, yMin, yMax, zMin, zMax,
             mode = meshmode,
-            device,
+            device, data_on_cpu,
             enlarge = EnlargeMesh,
         )
         if config.solver.grav isa ML
@@ -1216,7 +1217,7 @@ function get_all_data(sim::Simulation, ::Union{DirectSum, Tree}, ::CPU)
     return d
 end
 
-function get_all_data(sim::Simulation, ::Union{FDM, FFT}, ::CPU)
+function get_all_data(sim::Simulation, ::Union{FDM, FFT, ML}, ::CPU)
     return sim.simdata.data
 end
 
@@ -1226,7 +1227,7 @@ function get_all_data(sim::Simulation, ::DirectSum, ::GPU)
 end
 
 "Copy data to CPU"
-function get_all_data(sim::Simulation, ::Union{FDM, FFT}, ::GPU)
+function get_all_data(sim::Simulation, ::Union{FDM, FFT, ML}, ::GPU)
     CUDA.@allowscalar return StructArray(Array(sim.simdata.data))
 end
 
