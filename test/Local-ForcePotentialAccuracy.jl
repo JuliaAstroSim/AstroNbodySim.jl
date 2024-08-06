@@ -202,7 +202,7 @@ function cluster_accuracy()
         deepcopy(particles),
         GravitySolver = Tree(),
     );
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Force Error",
@@ -219,7 +219,7 @@ function cluster_accuracy()
     )
     Makie.save("./output/accuracy/ForceAccuracySmoothingLength.png", fig)
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Potential Error",
@@ -249,7 +249,7 @@ function cluster_accuracy()
     acc_ds = compute_force(ds, pos, 0.0u"kpc")
     pot_ds = compute_potential(ds, pos, 0.0u"kpc")
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Force Error",
@@ -266,7 +266,7 @@ function cluster_accuracy()
     )
     Makie.save("./output/accuracy/ForceAccuracyOpeningAngle.png", fig)
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Potential Error",
@@ -290,7 +290,7 @@ function scatter_accuracy(N::Int)
     @info "Relative to particle number"
     radii, ratio = accuracy_force(N)
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Force Error ($N particles)",
@@ -303,7 +303,7 @@ function scatter_accuracy(N::Int)
 
     radii, ratio = accuracy_potential(N)
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Potential Error ($N particles)",
@@ -353,7 +353,7 @@ function single_accuracy()
         GravitySolver = Tree(),
     );
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Force Error",
@@ -371,7 +371,7 @@ function single_accuracy()
     Makie.save("./output/accuracy/ForceAccuracyScatterSmoothingLength.png", fig)
     # No error, zero plot
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Potential Error",
@@ -394,7 +394,7 @@ function single_accuracy()
     acc_ds = compute_force(ds, pos, 0.0u"kpc")
     pot_ds = compute_potential(ds, pos, 0.0u"kpc")
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Force Error",
@@ -412,7 +412,7 @@ function single_accuracy()
     Makie.save("./output/accuracy/ForceAccuracyScatterOpeningAngle.png", fig)
     # No error, zero plot
 
-    fig = Makie.Figure(resolution = (800, 450))
+    fig = Makie.Figure(size = (800, 450))
     axis = Makie.Axis(
         fig[1,1],
         title = "Relative Potential Error",

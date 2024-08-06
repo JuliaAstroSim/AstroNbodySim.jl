@@ -1,5 +1,5 @@
 """
-    QUMOND_PDM_density(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 Compute ρ_PDM on the RHS (right hand side) of QUMOND (QUasi-linear MOdified Newtonian Dynamics).
 Return ρ_PDM
@@ -29,7 +29,7 @@ function mesh_set_boundary_potential_QUMOND(index, m, A, b, TA, sq, ms)
 end
 
 """
-    QUMOND_phi(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 First compute ρ_PDM, then solve QUMOND (QUasi-linear MOdified Newtonian Dynamics) equation on the mesh.
 Return modified potential
@@ -43,7 +43,7 @@ function QUMOND_phi(m::MeshCartesianStatic, ACC0::Number, G::Number)
 end
 
 """
-    QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 1. Compute ρ_PDM
 2. Solve modified potential on the mesh
@@ -62,7 +62,7 @@ function QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number)
 end
 
 """
-    QUMOND(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 Apply QUMOND (QUasi-linear MOdified Newtonian Dynamics) formula to accelerations
 """

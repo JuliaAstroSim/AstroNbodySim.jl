@@ -87,8 +87,8 @@ using FFMPEG
 
 function plotfigs(ds, ds_adapt, ts, ts_adapt)
     @info "Plotting radii"
-    FigScale    = Figure(resolution = (800, 800))
-    FigLagrange = Figure(resolution = (800, 700))
+    FigScale    = Figure(size = (800, 800))
+    FigLagrange = Figure(size = (800, 700))
 
     colors = ColorSchemes.tab10.colors
 
@@ -138,13 +138,13 @@ function plotfigs(ds, ds_adapt, ts, ts_adapt)
     
 
     #@info "Plotting positions"
-    #plot_positionslice(ds.config.output.dir,       "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
+    #plot_positionslice(ds.config.output.dir,       "snapshot_", collect(0:200), ".gadget2", gadget2(), size = (800,800),
     #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-    #plot_positionslice(ds_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
+    #plot_positionslice(ds_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(), size = (800,800),
     #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-    #plot_positionslice(ts.config.output.dir,       "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
+    #plot_positionslice(ts.config.output.dir,       "snapshot_", collect(0:200), ".gadget2", gadget2(), size = (800,800),
     #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
-    #plot_positionslice(ts_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(), dpi = 300, resolution = (800,800),
+    #plot_positionslice(ts_adapt.config.output.dir, "snapshot_", collect(0:200), ".gadget2", gadget2(), size = (800,800),
     #                   xlims = (-0.05, +0.05), ylims = (-0.05, +0.05), times = collect(0.0:0.0005:0.1) * u"Gyr")
    
 

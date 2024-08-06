@@ -157,7 +157,7 @@ function compute_local_potential_at_points(sim::Simulation, SoftLength::Number, 
     sim.buffer.sendbuffer[1] = compute_unit_potential_at_point.(pos, sim, SoftLength)
 end
 
-function compute_potential(sim::Simulation, pos::Union{Array{T,1}, T}, SoftLength::Number, GravSolver::DirectSum, Device::CPU) where T<:AbstractPoint3D
+function compute_potential(sim::Simulation, pos::Union{Array{T,N}, T}, SoftLength::Number, GravSolver::DirectSum, Device::CPU) where T<:AbstractPoint3D where N
     bcast(sim, :buffer, :recvbuffer, Dict(1 => pos))
     bcast(sim, compute_local_potential_at_points, args = (SoftLength, GravSolver, Device))
 

@@ -165,7 +165,7 @@ end
 
 function plot_orbit(sim, title::String)
     df = DataFrame(CSV.File(joinpath(sim.config.output.dir, "analysis.csv")))
-    fig = Figure(resolution = (960, 1080))
+    fig = Figure(size = (960, 1080))
     axis = GLMakie.Axis(fig[1,1]; title, xlabel = "x [kpc]", ylabel = "y [kpc]")
     axis.autolimitaspect = 1
     Makie.lines!(axis, df.x, df.y)
@@ -199,7 +199,7 @@ end
     AdaptLeapfrog = integrate_adapt_leapfrog(N, t1, x1, v1, filename = "output/Timestep/BinaryFreeFall-AdaptLeapfrog.csv")
 
 
-    f = GLMakie.Figure(; resolution = (1600, 900))
+    f = GLMakie.Figure(; size = (1600, 900))
     ax = GLMakie.Axis(f[1,1],
         title = "Time integration test: binary free fall",
         xlabel = "t [Gyr]",
@@ -252,7 +252,7 @@ end
        AdaptEuler = integrate_adapt_euler(   N, t1, x1, v1, filename = "output/Timestep/BinaryCircular-AdaptEuler.csv")
     AdaptLeapfrog = integrate_adapt_leapfrog(N, t1, x1, v1, filename = "output/Timestep/BinaryCircular-AdaptLeapfrog.csv")
 
-    f = GLMakie.Figure(; resolution = (1000, 1000))
+    f = GLMakie.Figure(; size = (1000, 1000))
     ax = GLMakie.Axis(f[1,1],
         title = "Time integration test: binary circular orbit (constant timestep)",
         xlabel = "x [kpc]",
@@ -269,7 +269,7 @@ end
     )
     Makie.save("output/Timestep/TimeIntegration-BinaryCircular-Const.png", f)
 
-    f = GLMakie.Figure(; resolution = (1000, 1000))
+    f = GLMakie.Figure(; size = (1000, 1000))
     ax = GLMakie.Axis(f[1,1],
         title = "Time integration test: binary circular orbit (adaptive timestep)",
         xlabel = "x [kpc]",

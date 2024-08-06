@@ -20,7 +20,7 @@ using Unitful, UnitfulAstro
 astro()
 mkpathIfNotExist("output")
 
-function plot_orbit_with_gap(sim::Simulation, title::String, gap::Int = 1; resolution = (800,800), kw...)
+function plot_orbit_with_gap(sim::Simulation, title::String, gap::Int = 1; size = (800,800), kw...)
     df = DataFrame(CSV.File(joinpath(sim.config.output.dir, "analysis.csv")))
     x = df.x
     y = df.y
@@ -58,7 +58,7 @@ function plot_orbit_with_gap(sim::Simulation, title::String, gap::Int = 1; resol
     p = Plots.plot(plot_x, plot_y,
         #title = title,
         aspect_ratio = 1, legend = nothing, xlabel = "x [kpc]", ylabel = "y [kpc]",
-        size = resolution,
+        size = size,
     )
     savefig(p, "output/" * title * ".png")
     @info "Total orbits: $(div(flip, 2))"
@@ -204,7 +204,7 @@ elliptic_adapt = Simulation(
     OutputDir = "output/EllipticOrbitAdapt",
 )
 run(elliptic_adapt)
-df = plot_orbit_with_gap(elliptic_adapt, "Elliptic Orbit (adaptive)", 40, resolution = (600,300))
+df = plot_orbit_with_gap(elliptic_adapt, "Elliptic Orbit (adaptive)", 40, size = (600,300))
 
 # Fixed timesteps
 Δt = df.time[2:end-1] .- df.time[1:end-2]
@@ -219,7 +219,7 @@ elliptic_const = Simulation(
     OutputDir = "output/EllipticOrbitConst",
 )
 run(elliptic_const)
-df = plot_orbit_with_gap(elliptic_const, "Elliptic Orbit (const)", 40, resolution = (600,300))
+df = plot_orbit_with_gap(elliptic_const, "Elliptic Orbit (const)", 40, size = (600,300))
 
 
 
@@ -268,7 +268,7 @@ run(m)
 
 # plot the orbit with uncertainties
 function plot_orbit_with_uncertainties(sim::Simulation, title::String;
-    resolution = (800,450),
+    size = (800,450),
     xlabel = "x [kpc]", ylabel = "y [kpc]",
 )
     df = DataFrame(CSV.File(joinpath(sim.config.output.dir, "analysis.csv")))
@@ -294,7 +294,7 @@ function plot_orbit_with_uncertainties(sim::Simulation, title::String;
     p = Plots.plot(x[1:flip], y[1:flip];
         ribbon = yerror[1:flip], legend=nothing,
         xlabel, ylabel, title,
-        size = resolution,
+        size = size,
         aspect_ratio = 1,
     )
     Plots.plot!(p, x[flip+1:end], y[flip+1:end]; ribbon = yerror[flip+1:end])
@@ -302,7 +302,7 @@ function plot_orbit_with_uncertainties(sim::Simulation, title::String;
     savefig(p, "output/" * title * ".png")
     return DataFrame(time = df.time, x = xm, y = ym)
 end
-plot_orbit_with_uncertainties(m, "Uncertainty of elliptic orbit", resolution = (800,450))
+plot_orbit_with_uncertainties(m, "Uncertainty of elliptic orbit", size = (800,450))
 
 # autodiff?
 Measurements.derivative(m.simdata.Pos[1].y.val, m.simdata.Mass[2].val)

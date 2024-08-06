@@ -80,7 +80,7 @@ run(gpu)
 
 # Plot
 plot_positionslice(gpu.config.output.dir, "snapshot_", collect(0:100), ".gadget2", gadget2(),
-    dpi = 300, resolution = (400,400),
+    size = (400,400),
     xlims = (-200.0, +200.0), ylims = (-200.0, +200.0),
     times = collect(0.0:0.03:3.0) * u"Gyr",
     collection = DISK,

@@ -145,7 +145,7 @@ legend = Legend(
 Makie.save("output/ScalingDistributed.png", fig)
 
 # Plot multi-threading and distributed
-fig = Figure(;resolution=(800,450))
+fig = Figure(;size=(800,450))
 axis = GLMakie.Axis(
     fig[1,1],
     title = "Scaling of mean total time",
@@ -209,7 +209,7 @@ CSV.write("output/ScalingNumber.csv", df)
 df = DataFrame(CSV.File("output/ScalingNumber.csv"))
 =#
 
-fig = Figure(; resolution=(800,450))
+fig = Figure(; size=(800,450))
 axis = GLMakie.Axis(
     fig[1,1],
     title = "Scaling of mean total time",

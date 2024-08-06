@@ -81,6 +81,6 @@ function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT, ML}, Device:
     add_timer(sim, "FORCE", t_FORCE, time_ns())
 end
 
-function compute_force(sim::Simulation, pos::Union{Array{T,1}, T}, SoftLength::Number, GravSolver::Union{FFT,FDM}, Device::CPU) where T<:AbstractPoint3D
+function compute_force(sim::Simulation, pos::Union{Array{T,N}, T}, SoftLength::Number, GravSolver::Union{FFT,FDM}, Device::CPU) where T<:AbstractPoint3D where N
     return mesh2particle.(sim.simdata, pos, :acc, sim.simdata.config.mode, sim.simdata.config.assignment)
 end

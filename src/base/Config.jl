@@ -859,7 +859,7 @@ mutable struct VisualizationInfo
     progress::Progress
 
     PlotData
-    resolution
+    size
     fig
 
     Realtime::Bool
@@ -879,7 +879,7 @@ $(TYPEDSIGNATURES)
 function VisualizationInfo(;
         Realtime::Bool = false,
         RenderTime::Float64 = 0.2,
-        resolution = (1000, 1000),
+        size = (1000, 1000),
         xlims = nothing,
         ylims = nothing,
         zlims = nothing,
@@ -889,7 +889,7 @@ function VisualizationInfo(;
         Progress(0),
 
         nothing,
-        resolution,
+        size,
         nothing,
 
         Realtime, RenderTime, 0.0,
@@ -975,7 +975,7 @@ function Simulation(d;
     # VisualizationInfo
     Realtime::Bool = false,
     RenderTime::Float64 = 0.2,
-    resolution = (1000, 1000),
+    size = (1000, 1000),
 
     xlims = nothing,
     ylims = nothing,
@@ -1044,7 +1044,7 @@ function Simulation(d;
                         PhysicsInfo(),
                         StreamInfo(),
                         VisualizationInfo(;
-                            Realtime = $Realtime, RenderTime = $RenderTime, resolution = $resolution,
+                            Realtime = $Realtime, RenderTime = $RenderTime, size = $size,
                             xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
                         ),
                         AstroNbodySim.Buffer($config),
@@ -1060,7 +1060,7 @@ function Simulation(d;
                     LogInfo(; timers, analysers),
                     PhysicsInfo(),
                     StreamInfo(),
-                    VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+                    VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                     AstroNbodySim.Buffer(config),
                     bgforce, bgpotential,
                 )
@@ -1078,7 +1078,7 @@ function Simulation(d;
                     LogInfo(; timers, analysers),
                     PhysicsInfo(),
                     StreamInfo(),
-                    VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+                    VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                     AstroNbodySim.Buffer(config),
                     bgforce, bgpotential,
                 )
@@ -1113,7 +1113,7 @@ function Simulation(d;
             PhysicsInfo(),
             StreamInfo(),
             VisualizationInfo(;
-                Realtime = $Realtime, RenderTime = $RenderTime, resolution = $resolution,
+                Realtime = $Realtime, RenderTime = $RenderTime, size = $size,
                 xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
             ),
             AstroNbodySim.Buffer($config),
@@ -1129,7 +1129,7 @@ function Simulation(d;
                 LogInfo(; timers, analysers),
                 PhysicsInfo(),
                 StreamInfo(),
-                VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+                VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                 AstroNbodySim.Buffer(config),
                 bgforce, bgpotential,
             )
@@ -1158,7 +1158,7 @@ function Simulation(d;
             LogInfo(; timers, analysers),
             PhysicsInfo(),
             StreamInfo(),
-            VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+            VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
             AstroNbodySim.Buffer(config),
             bgforce, bgpotential,
         )

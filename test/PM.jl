@@ -191,7 +191,7 @@ mkpathIfNotExist("output/PM")
             acc_ds = norm.(compute_force(ds, pos, 0.01u"kpc"))
             acc_pm = norm.(compute_force(pm, pos, 0.01u"kpc"))
             
-            f = Figure(; resolution = (800,450))
+            f = Figure(; size = (800,450))
             axis = GLMakie.Axis(f[1,1],
                 title = "Radial acceleration of single particle",
                 xlabel = "log10(R [kpc])",
@@ -231,7 +231,7 @@ mkpathIfNotExist("output/PM")
             compute_force(pm)
 
 
-            f = Figure(; resolution = (800,450))
+            f = Figure(; size = (800,450))
             axis = GLMakie.Axis(f[1,1],
                 title = "Radial acceleration of Plummer star cluster",
                 xlabel = "log10(R [kpc])",
@@ -279,17 +279,17 @@ L2norm(r) = sqrt(sum((r.^2)/prod(size(r))))
             s = sol.(m.pos)
             r = m.phi .- s
 
-            f = Figure(; resolution = (1200,900))
+            f = Figure(; size = (1200,900))
             a = GLMakie.Axis(f[1,1]; title = "Error of potential $(Nx) $(traitstring(boundary))")
             GLMakie.lines!(a, r)
             Makie.save("output/PM/fft1D-$(traitstring(boundary))-$(Nx)-error.png", f)
 
-            f = Figure(; resolution = (1200,900))
+            f = Figure(; size = (1200,900))
             a = GLMakie.Axis(f[1,1]; title = "Solution of potential $(Nx) $(traitstring(boundary))")
             GLMakie.lines!(a, m.phi)
             Makie.save("output/PM/fft1D-$(traitstring(boundary))-$(Nx)-solution.png", f)
 
-            f = Figure(; resolution = (1200,900))
+            f = Figure(; size = (1200,900))
             a = GLMakie.Axis(f[1,1]; title = "Exact value of potential $(Nx) $(traitstring(boundary))")
             GLMakie.lines!(a, s)
             Makie.save("output/PM/fft1D-$(traitstring(boundary))-$(Nx)-exact.png", f)
@@ -447,17 +447,17 @@ end
             s = sol.(Array(m.pos))
             r = Array(m.phi) .- s
 
-            f = Figure(; resolution = (1200,900))
+            f = Figure(; size = (1200,900))
             a = GLMakie.Axis(f[1,1]; title = "Error of potential $(Nx) $(traitstring(boundary))")
             GLMakie.lines!(a, r)
             Makie.save("output/PM/fdm1D-$(traitstring(device))-$(traitstring(boundary))-$(Nx)-error.png", f)
 
-            f = Figure(; resolution = (1200,900))
+            f = Figure(; size = (1200,900))
             a = GLMakie.Axis(f[1,1]; title = "Solution of potential $(Nx) $(traitstring(boundary))")
             GLMakie.lines!(a, Array(m.phi))
             Makie.save("output/PM/fdm1D-$(traitstring(device))-$(traitstring(boundary))-$(Nx)-solution.png", f)
 
-            f = Figure(; resolution = (1200,900))
+            f = Figure(; size = (1200,900))
             a = GLMakie.Axis(f[1,1]; title = "Exact value of potential $(Nx) $(traitstring(boundary))")
             GLMakie.lines!(a, s)
             Makie.save("output/PM/fdm1D-$(traitstring(device))-$(traitstring(boundary))-$(Nx)-exact.png", f)

@@ -109,7 +109,7 @@ run(elliptic)
 ### Plot
 L = ustrip(R)
 plot_positionslice(elliptic.config.output.dir, "snapshot_", collect(0:100), ".gadget2", gadget2(),
-    dpi = 300, resolution = (400,400),
+    size = (400,400),
     xlims = (-0.6L, +1.4L), ylims = (-L, +L),
     times = collect(0:100) * TimeBetweenSnapshots,
     markersize = 0.0001,
@@ -128,7 +128,7 @@ for i in 2:length(N)
 end
 @info "Total particles accreated: $(N[end])"
 
-fig = Figure(; resolution = (800, 450))
+fig = Figure(; size = (800, 450))
 axis = GLMakie.Axis(fig[1,1],
     title = "Total number of accreated particles",
     xlabel = "t [Gyr]",

@@ -24,7 +24,7 @@ function makie_scatter(sim::Simulation, GravSolver::Gravity, Device::DeviceType;
         sim.visinfo.PlotData;
         markersize = iszero(sim.visinfo.markersize) ? estimate_markersize(pos) : sim.visinfo.markersize,
         markerspace=:data,
-        figure = (resolution = sim.visinfo.resolution,),
+        figure = (size = sim.visinfo.size,),
     )
 
     f,a,p = sim.visinfo.fig
