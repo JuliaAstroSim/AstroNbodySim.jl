@@ -104,18 +104,28 @@ function run(sim::Simulation)
         begin_timer(sim, "DRIFT")
         begin_timer(sim, "KICK")
         begin_timer(sim, "ANALYSIS")
+        begin_timer(sim, "POSTSTEP")
         begin_timer(sim, "OUTPUT")
         begin_timer(sim, "PLOT")
         
         # force computation, time integration, logging of various types of simulation
         step(sim, GravSolver, Device) 
 
-        # Do whatever you want with the entire data of simulation !!!
+        # Analyse the simulation state
         t_ANALYSIS = time_ns()
         if !isempty(sim.loginfo.analysers)
             push!(analysis, write_analysis(sim))
         end
         add_timer(sim, "ANALYSIS", t_ANALYSIS, time_ns())
+
+        # Post-step: do whatever you want with the entire data of simulation !!!
+        t_POSTSTEP = time_ns()
+        if !isempty(sim.poststep)
+            for ps in sim.poststep
+                ps(sim)
+            end
+        end
+        add_timer(sim, "POSTSTEP", t_POSTSTEP, time_ns())
         
         # Plot
         if sim.visinfo.Realtime && time() - sim.visinfo.last_plot_time > sim.visinfo.RenderTime

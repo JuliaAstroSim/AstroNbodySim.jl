@@ -649,8 +649,9 @@ DefaultTimer = Dict(
        "DRIFT" => 3,
         "KICK" => 4,
     "ANALYSIS" => 5,
-      "OUTPUT" => 6,
-        "PLOT" => 7,
+    "POSTSTEP" => 6,
+      "OUTPUT" => 7,
+        "PLOT" => 8,
 )
 
 """
@@ -930,8 +931,9 @@ struct Simulation{D}
     "`::Buffer`"
     buffer
 
-    bgforce::Vector{Function}
-    bgpotential::Vector{Function}
+    bgforce
+    bgpotential
+    poststep
 end
 
 function Base.show(io::IO, sim::Simulation)
@@ -985,6 +987,7 @@ function Simulation(d;
     # background fields
     bgforce = Function[],
     bgpotential = Function[],
+    poststep = Function[],
 
     # Tree method
     TreeOpenAngle = 0.1,
@@ -1048,7 +1051,7 @@ function Simulation(d;
                             xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
                         ),
                         AstroNbodySim.Buffer($config),
-                        $bgforce, $bgpotential,
+                        $bgforce, $bgpotential, $poststep,
                     )))
             end
             if !haskey(registry, id) # Master is not in pids, init empty data
@@ -1062,7 +1065,7 @@ function Simulation(d;
                     StreamInfo(),
                     VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                     AstroNbodySim.Buffer(config),
-                    bgforce, bgpotential,
+                    bgforce, bgpotential, poststep,
                 )
             end
             @info "Data cuts: " * string(gather(registry[id], numlocal))
@@ -1080,7 +1083,7 @@ function Simulation(d;
                     StreamInfo(),
                     VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                     AstroNbodySim.Buffer(config),
-                    bgforce, bgpotential,
+                    bgforce, bgpotential, poststep,
                 )
             end
         end
@@ -1117,7 +1120,7 @@ function Simulation(d;
                 xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
             ),
             AstroNbodySim.Buffer($config),
-            $bgforce, $bgpotential,
+            $bgforce, $bgpotential, $poststep,
         )
 
         if !haskey(registry, id) # Master is not in pids, init empty data
@@ -1131,7 +1134,7 @@ function Simulation(d;
                 StreamInfo(),
                 VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                 AstroNbodySim.Buffer(config),
-                bgforce, bgpotential,
+                bgforce, bgpotential, poststep,
             )
         end
         @info "Data cuts: " * string(gather(registry[id], numlocal))
@@ -1160,7 +1163,7 @@ function Simulation(d;
             StreamInfo(),
             VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
             AstroNbodySim.Buffer(config),
-            bgforce, bgpotential,
+            bgforce, bgpotential, poststep,
         )
     elseif config.solver.grav isa ML
     end
@@ -1261,4 +1264,8 @@ function check_compatibility(config::SimConfig)
     check_QUMOND(config)
     check_tree(config)
     check_mesh(config)
+end
+
+function empty_function(sim::Simulation)
+    # Do nothing
 end
