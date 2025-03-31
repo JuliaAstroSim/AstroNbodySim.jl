@@ -47,7 +47,7 @@ using GLMakie
 using LoopVectorization
 
 # Machine Learning
-using Lux, LuxCUDA
+# using Lux, LuxCUDA
 using MLUtils
 using Optimisers
 using Images

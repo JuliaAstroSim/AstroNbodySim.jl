@@ -154,7 +154,18 @@ end
 
 function compute_local_potential_at_points(sim::Simulation, SoftLength::Number, ::DirectSum, ::CPU)
     pos = sim.buffer.recvbuffer[1]
-    sim.buffer.sendbuffer[1] = compute_unit_potential_at_point.(pos, sim, SoftLength)
+
+    potpermass = sim.config.ZeroValues.potpermass
+    # pot = fill(potpermass, size(pos))
+    pot = Array{typeof(potpermass), ndims(pos)}(undef, size(pos))
+    Threads.@threads for k in 1:Threads.nthreads()
+        Head, Tail = split_block(length(pos), k, Threads.nthreads())
+        for i in Head:Tail
+            @inbounds pot[i] = compute_unit_potential_at_point(pos[i], sim, SoftLength)
+        end
+    end
+
+    sim.buffer.sendbuffer[1] = pot
 end
 
 function compute_potential(sim::Simulation, pos::Union{Array{T,N}, T}, SoftLength::Number, GravSolver::DirectSum, Device::CPU) where T<:AbstractPoint3D where N
