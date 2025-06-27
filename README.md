@@ -87,6 +87,36 @@ This software was developed as part of academic research. If you would like to h
 
 ## Package ecosystem
 
+```mermaid
+graph LR
+    A[AstroSimBase.jl] --> C[PhysicalParticles.jl]
+    B[ParallelOperations.jl] --> C
+    C --> D[AstroIO.jl]
+    C --> E[AstroIC.jl]
+    C --> F[PhysicalFDM.jl]
+    C --> G[PhysicalFFT.jl]
+    B --> H[PhysicalTrees.jl]
+    C --> H
+    B --> I[PhysicalMeshes.jl]
+    C --> I
+    D --> J[AstroPlot.jl]
+    H --> J
+    I --> J
+    J --> K[AstroNbodySim.jl]
+    D --> K
+    E --> K
+    F --> K
+    G --> K
+    H --> K
+    I --> K
+    J --> K
+    K --> L[WaveDM.jl]
+    F --> L
+    G --> L
+    I --> L
+    N[GalacticDynamics.jl] --> E
+```
+
 - Basic data structure: [PhysicalParticles.jl](https://github.com/JuliaAstroSim/PhysicalParticles.jl)
 - File I/O: [AstroIO.jl](https://github.com/JuliaAstroSim/AstroIO.jl)
 - Initial Condition: [AstroIC.jl](https://github.com/JuliaAstroSim/AstroIC.jl)
