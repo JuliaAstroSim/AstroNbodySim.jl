@@ -114,7 +114,7 @@ plot_positionslice(elliptic.config.output.dir, "snapshot_", collect(0:100), ".ga
     times = collect(0:100) * TimeBetweenSnapshots,
     markersize = 0.0001,
 )
-plt = mosaicview(elliptic.config.output.dir, "pos_", collect(1:9:100), ".png"; fillvalue = 0.5, npad = 3, ncol = 4, rowmajor = true);
+plt = mosaic(elliptic.config.output.dir, "pos_", collect(1:9:100), ".png"; fillvalue = 0.5, npad = 3, ncol = 4, rowmajor = true);
 save("output/TDE-elliptic-mosaic.png", plt)
 
 # Accretion history

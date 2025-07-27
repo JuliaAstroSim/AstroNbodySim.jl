@@ -75,6 +75,9 @@ Accretion history:
 ### Solar System
 ![Solar System](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/readme/SolarSystem.gif)
 
+### Trajectory lookback
+![Trajectory lookback](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/docs/src/examples/pics/readme/traj_lookback_all_arrow_axes_20250721v2_2Gyr.mp4)
+
 ## Supporting and Citing
 
 This software was developed as part of academic research. If you would like to help support it, please star the repository. If you use this software as part of your research, teaching, or other activities, we would be grateful if you could cite the following:

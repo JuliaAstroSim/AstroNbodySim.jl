@@ -29,7 +29,7 @@ pids = addprocs(4)
 
 @everywhere astro()
 
-mkpathIfNotExist("output")
+mkpathIfNotExist(joinpath(@__DIR__, "output"))
 
 using ColorSchemes
 colors = ColorSchemes.tab10.colors;

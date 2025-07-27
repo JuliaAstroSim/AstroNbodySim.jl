@@ -122,7 +122,7 @@ function galaxy_colliders(angle::Float64, vel::Number;
     Makie.save("output/RotationCurve - $simlabel.png", fig)
 
     Counts = collect(0:Int(TimeEnd/TimeBetweenSnapshots/50):Int(TimeEnd/TimeBetweenSnapshots))[1:end-1]
-    fig = mosaicview(sim.config.output.dir, "pos_", Counts, ".png"; fillvalue=0.5, npad=5, ncol=10, rowmajor=true)
+    fig = mosaic(sim.config.output.dir, "pos_", Counts, ".png"; fillvalue=0.5, npad=5, ncol=10, rowmajor=true)
     Makie.save("output/mosaic - $simlabel.png", fig)
 
     # release memory of former simulations
