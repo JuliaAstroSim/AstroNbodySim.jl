@@ -344,7 +344,7 @@
                 pos = PVector(u"kpc")
                 BoxPot = AstroNbodySim.compute_unit_potential_at_point(pos, BoxData, G, SoftLen)
                 for sim in BoxSims
-                    @test first(compute_potential(sim, pos, SoftLen)) ≈ BoxPot
+                    @test first(compute_potential(sim, [pos], SoftLen, sim.config.solver.grav, sim.config.device.type)) ≈ BoxPot
                 end
             end
         end
@@ -405,7 +405,7 @@
                 pos = PVector()
                 BoxPotUnitless = AstroNbodySim.compute_unit_potential_at_point(pos, BoxDataUnitless, GUnitless, SoftLenUnitless)
                 for sim in BoxSimsUnitless
-                    @test first(compute_potential(sim, pos, SoftLenUnitless)) ≈ BoxPotUnitless
+                    @test first(compute_potential(sim, [pos], SoftLenUnitless, sim.config.solver.grav, sim.config.device.type)) ≈ BoxPotUnitless
                 end
             end
         end
@@ -650,7 +650,7 @@
                 pos = PVector(u"kpc")
                 BoxPot = AstroNbodySim.compute_unit_potential_at_point(pos, BoxData, G, SoftLen)
                 for sim in BoxSims
-                    @test first(compute_potential(sim, pos, SoftLen)) ≈ BoxPot
+                    @test first(compute_potential(sim, [pos], SoftLen, sim.config.solver.grav, sim.config.device.type)) ≈ BoxPot
                 end
             end
         end
@@ -715,7 +715,7 @@
                 pos = PVector()
                 BoxPotUnitless = AstroNbodySim.compute_unit_potential_at_point(pos, BoxDataUnitless, GUnitless, SoftLenUnitless)
                 for sim in BoxSimsUnitless
-                    @test first(compute_potential(sim, pos, SoftLenUnitless)) ≈ BoxPotUnitless
+                    @test first(compute_potential(sim, [pos], SoftLenUnitless, sim.config.solver.grav, sim.config.device.type)) ≈ BoxPotUnitless
                 end
             end
         end
