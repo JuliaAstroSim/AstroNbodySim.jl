@@ -1,10 +1,10 @@
 """
-    QUMOND_PDM_density(m::MeshCartesianStatic, ACC0::Number)
+$TYPEDSIGNATURES
 
 Compute ρ_PDM on the RHS (right hand side) of QUMOND (QUasi-linear MOdified Newtonian Dynamics).
 Return ρ_PDM
 """
-function QUMOND_PDM_density(m::MeshCartesianStatic, ACC0::Number)
+function QUMOND_PDM_density(m::MeshCartesianStatic, ACC0::Number, G::Number)
     config = m.config
     accNewton = m.acc
     accNorm = sqrt.(accNewton.x .* accNewton.x + accNewton.y .* accNewton.y + accNewton.z .* accNewton.z)
@@ -16,10 +16,10 @@ function QUMOND_PDM_density(m::MeshCartesianStatic, ACC0::Number)
 
     #TODO MOND boundary conditions
     # Divergence of vector field
-    ρx = diff_central_x(config.Δ[1], RHS.x)
-    ρy = diff_central_y(config.Δ[2], RHS.y)
-    ρz = diff_central_z(config.Δ[3], RHS.z)
-    return ρPDM = ρx + ρy + ρz
+    ρx = diff_central_x(config.Δ[1], RHS.x) 
+    ρy = diff_central_y(config.Δ[2], RHS.y) 
+    ρz = diff_central_z(config.Δ[3], RHS.z) 
+    return ρPDM = (ρx + ρy + ρz) ./ (4π*G)
 end
 
 function mesh_set_boundary_potential_QUMOND(index, m, A, b, TA, sq, ms)
@@ -29,94 +29,21 @@ function mesh_set_boundary_potential_QUMOND(index, m, A, b, TA, sq, ms)
 end
 
 """
-    QUMOND_phi(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 First compute ρ_PDM, then solve QUMOND (QUasi-linear MOdified Newtonian Dynamics) equation on the mesh.
 Return modified potential
+
+Warning: Currently the Poisson equation is solved with periodic boundary conditions
 """
-function QUMOND_phi(m::MeshCartesianStatic, ACC0::Number, G::Number, Device::DeviceType, sparse::Bool)
-    config = m.config
-
-    ms = ustrip(mass_center(m))
-    M = ustrip(total_mass(m))
-    sq = ustrip(sqrt(G * M * ACC0))
-
-    g = 4 * pi * G
-    ρPDM = QUMOND_PDM_density(m, ACC0) .* g
-
-    NX = config.N[1] + 2 * config.NG + 1
-    NY = config.N[2] + 2 * config.NG + 1
-    NZ = config.N[3] + 2 * config.NG + 1
-
-    A = delta_mat3(NX, NY, NZ, ustrip.(getuLength(config.units), config.Δ)...;
-        m.config.boundary, sparse,
-    )
-    b = ustrip.(Array(ρPDM .* (4 * pi * G))[:])
-
-    # Manually set boundary potential and set diagonal element to one
-    # Because the mesh can have no particle data, we compute potential by mesh.rho
-    TA = eltype(A)
-    Tb = eltype(b)
-    Tphi = eltype(m.phi)
-
-    # Omit edge points
-    mesh_set_boundary_potential_QUMOND(1, m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(NX, m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(NX*(NY-1)+1, m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(NX*NY, m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(1 + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(NX + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(NX*(NY-1)+1 + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-    mesh_set_boundary_potential_QUMOND(NX*NY*NZ, m, A, b, TA, sq, ms)
-
-    for i in 2:NX-1
-        mesh_set_boundary_potential_QUMOND(i, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*(NY-1)+i, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(i + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*(NY-1)+i + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-    end
-
-    for j in 2:NY-1
-        mesh_set_boundary_potential_QUMOND(NX*(j-1)+1, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*j, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*(j-1)+1 + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*j + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-    end
-
-    for k in 2:NZ-1
-        mesh_set_boundary_potential_QUMOND(NX*NY*(k-1) + 1, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*NY*(k-1) + NX, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*NY*(k-1) + NX*(NY-1)+1, m, A, b, TA, sq, ms)
-        mesh_set_boundary_potential_QUMOND(NX*NY*(k-1) + NX*NY, m, A, b, TA, sq, ms)
-    end
-
-    # face
-    for j in 2:NY-1
-        for i in 2:NX-1
-            mesh_set_boundary_potential_QUMOND(NY*(j-1)+i, m, A, b, TA, sq, ms)
-            mesh_set_boundary_potential_QUMOND(NY*(j-1)+i + NX*NY*(NZ-1), m, A, b, TA, sq, ms)
-        end
-    end
-
-    for k in 2:NZ-1
-        for i in 2:NX-1
-            mesh_set_boundary_potential_QUMOND(NX*NY*(k-1)+i, m, A, b, TA, sq, ms)
-            mesh_set_boundary_potential_QUMOND(NX*NY*(k-1)+i + NX*(NY-1), m, A, b, TA, sq, ms)
-        end
-    end
-
-    for k in 2:NZ-1
-        for j in 2:NY-1
-            mesh_set_boundary_potential_QUMOND(NX*NY*(k-1) + (j-1)*NX + 1, m, A, b, TA, sq, ms)
-            mesh_set_boundary_potential_QUMOND(NX*NY*(k-1) + (j-1)*NX + NX, m, A, b, TA, sq, ms)
-        end
-    end
-
-    return reshape(solve_matrix_equation(A, b, Device), NX, NY, NZ) .* unit(eltype(m.phi))
+function QUMOND_phi(m::MeshCartesianStatic, ACC0::Number, G::Number)
+    rho_PDM = QUMOND_PDM_density(m, ACC0, G)
+    rho = rho_PDM + m.rho
+    fft_poisson(m.config.Δ, m.config.Len, ustrip.(rho*4π*G), Periodic(), m.config.device) .* unit(eltype(m.phi))
 end
 
 """
-    QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 1. Compute ρ_PDM
 2. Solve modified potential on the mesh
@@ -124,9 +51,9 @@ end
 
 Return acceleration
 """
-function QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number, Device::DeviceType, sparse::Bool)
+function QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number)
     config = m.config
-    phi_PDM = QUMOND_phi(m, ACC0, G, Device, sparse)
+    phi_PDM = QUMOND_phi(m, ACC0, G)
     acc = similar(m.acc)
     acc.x .= -diff_central_x(config.Δ[1], phi_PDM)
     acc.y .= -diff_central_y(config.Δ[2], phi_PDM)
@@ -135,13 +62,13 @@ function QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number, Device::Dev
 end
 
 """
-    QUMOND(m::MeshCartesianStatic, ACC0::Number, G::Number)
+$TYPEDSIGNATURES
 
 Apply QUMOND (QUasi-linear MOdified Newtonian Dynamics) formula to accelerations
 """
-function QUMOND_acc!(m::MeshCartesianStatic, ACC0::Number, G::Number, Device::DeviceType, sparse::Bool)
+function QUMOND_acc!(m::MeshCartesianStatic, ACC0::Number, G::Number)
     config = m.config
-    phi_PDM = QUMOND_phi(m, ACC0, G, Device, sparse)
+    phi_PDM = QUMOND_phi(m, ACC0, G)
     m.acc.x .-= diff_central_x(config.Δ[1], phi_PDM)
     m.acc.y .-= diff_central_y(config.Δ[2], phi_PDM)
     m.acc.z .-= diff_central_z(config.Δ[3], phi_PDM)

@@ -66,7 +66,7 @@ run(sim)
 
 
 #=
-plot_positionslice("output/test", "snapshot_", collect(0:500), ".gadget2", gadget2(), resolution = (800, 800),
+plot_positionslice("output/test", "snapshot_", collect(0:500), ".gadget2", gadget2(), size = (800, 800),
                    xlims = (-0.15,0.15), ylims = (-0.15,0.15), markersize = 1.0)
 ffmpeg_exe(`-v error -framerate 25 -loop 0 -i output/test/pos_%04d.png output/test.mp4`)
 =#
@@ -113,7 +113,7 @@ function galaxy_colliders(angle::Float64, vel::Number;
     )
     run(sim)
 
-    plot_positionslice(sim.config.output.dir, "snapshot_", collect(0:Int(TimeEnd/TimeBetweenSnapshots)), ".gadget2", gadget2(), resolution = (960, 960),
+    plot_positionslice(sim.config.output.dir, "snapshot_", collect(0:Int(TimeEnd/TimeBetweenSnapshots)), ".gadget2", gadget2(), size = (960, 960),
         xlims = (-0.15,0.15), ylims = (-0.15,0.15), markersize = 0.1, times = collect(0.0u"Gyr":TimeBetweenSnapshots:TimeEnd))
     
     ffmpeg_exe(`-v error -framerate 25 -loop 0 -i $(sim.config.output.dir)/pos_%04d.png output/'video - '$(simlabel).mp4`)
@@ -122,7 +122,7 @@ function galaxy_colliders(angle::Float64, vel::Number;
     Makie.save("output/RotationCurve - $simlabel.png", fig)
 
     Counts = collect(0:Int(TimeEnd/TimeBetweenSnapshots/50):Int(TimeEnd/TimeBetweenSnapshots))[1:end-1]
-    fig = mosaicview(sim.config.output.dir, "pos_", Counts, ".png"; fillvalue=0.5, npad=5, ncol=10, rowmajor=true)
+    fig = mosaic(sim.config.output.dir, "pos_", Counts, ".png"; fillvalue=0.5, npad=5, ncol=10, rowmajor=true)
     Makie.save("output/mosaic - $simlabel.png", fig)
 
     # release memory of former simulations

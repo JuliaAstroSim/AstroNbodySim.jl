@@ -20,16 +20,19 @@ using Distributed
 pids = addprocs(4)
 
 @everywhere using AstroNbodySim
+@everywhere using AstroNbodySim.AstroSimBase
 
 @everywhere using Unitful, UnitfulAstro
 
 @everywhere using PhysicalParticles
 @everywhere using PhysicalTrees
 @everywhere using PhysicalMeshes
+@everywhere using AstroNbodySim.PhysicalFDM
+@everywhere using AstroNbodySim.PhysicalFFT
 
 @everywhere astro()
 
-mkpathIfNotExist("output")
+mkpathIfNotExist(joinpath(@__DIR__, "output"))
 
 using ColorSchemes
 colors = ColorSchemes.tab10.colors;
@@ -38,11 +41,12 @@ Makie.inline!(true)
 
 using CUDA
 
-include("StaticTest.jl")
-
-include("PM.jl")
 
 IsLocal = false
+
+include("StaticTest.jl")
+include("PM.jl")
+
 if IsLocal
     include("Local-Timestep.jl")
     include("Local-Plummer.jl")

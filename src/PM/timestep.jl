@@ -1,4 +1,4 @@
-function drift_particles_adaptive_timestep(sim::Simulation, next_int::Int , GravSolver::Union{FFT, FDM}, Device::CPU)
+function drift_particles_adaptive_timestep(sim::Simulation, next_int::Int , GravSolver::Union{FFT, FDM, ML}, Device::CPU)
     timeinfo = sim.timeinfo
     timeinfo.last_system_time_int = timeinfo.system_time_int
     timeinfo.system_time_int = next_int
@@ -6,19 +6,28 @@ function drift_particles_adaptive_timestep(sim::Simulation, next_int::Int , Grav
     drift_particles_kernel(sim, GravSolver, Device)
 end
 
-function drift_particles_const_timestep(sim::Simulation, next_float::Number , GravSolver::Union{FFT, FDM}, Device::CPU)
+function drift_particles_const_timestep(sim::Simulation, next_float::Number , GravSolver::Union{FFT, FDM, ML}, Device::CPU)
     timeinfo = sim.timeinfo
     timeinfo.last_system_time_float = timeinfo.system_time_float
     timeinfo.system_time_float = next_float
     drift_particles_kernel(sim, GravSolver, Device)
 end
 
+"""
+$(TYPEDSIGNATURES)
+
+Particles running out of the mesh will be deleted
+"""
 function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::Delete)
     list = outbound_list(m)
     StructArrays.foreachfield(v->deleteat!(v, list), sim.simdata.data)
 end
 
+"""
+$(TYPEDSIGNATURES)
 
+Use direct summation method to compute forces of outbound particles
+"""
 function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::DS)
     list = outbound_list(m)
     data = m.data
@@ -32,7 +41,11 @@ function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::DS)
     end
 end
 
+"""
+$(TYPEDSIGNATURES)
 
+Use a larger but coarser mesh to compute forces of outbound particles
+"""
 function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::CoarseMesh)
     G = sim.config.constants.G
     ACC0 = sim.config.constants.ACC0
@@ -48,7 +61,7 @@ function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::CoarseMesh)
         Ny = 10,
         Nz = 10,
         assign = true,
-        gpu = device isa GPU ? true : false,
+        device,
         enlarge = 1.2,
     )
 
@@ -56,6 +69,8 @@ function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::CoarseMesh)
         fdm_poisson(coarsemesh, Val(coarsemesh.config.dim), G, coarsemesh.config.mode, device, coarsemesh.config.boundary, sim.config.grav.sparse)
     elseif GravSolver isa FFT
         fft_poisson(coarsemesh, G)
+    elseif GravSolver isa ML
+        cnn_poisson(coarsemesh, UnitProjection(coarsemesh), sim.config.solver.data)
     end
 
     compute_acc(coarsemesh, Val(coarsemesh.config.dim), coarsemesh.config.mode)
@@ -79,7 +94,7 @@ function outbound_rule(sim::Simulation, m::MeshCartesianStatic, ::CoarseMesh)
     #TODO GPU
 end
 
-function step(sim::Simulation, GravSolver::Union{FFT, FDM}, Device::DeviceType)
+function step(sim::Simulation, GravSolver::Union{FFT, FDM, ML}, Device::DeviceType)
     m = sim.simdata
 
     # Drift and output

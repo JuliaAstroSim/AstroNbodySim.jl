@@ -59,7 +59,7 @@ run(sim)
 # Plot
 title = "Orbit in potential field of Plummer model"
 df = DataFrame(CSV.File(joinpath(sim.config.output.dir, "analysis.csv")))
-fig = Figure(resolution = (800,800))
+fig = Figure(size = (800,800))
 axis = GLMakie.Axis(fig[1,1]; title, xlabel = "x [kpc]", ylabel = "y [kpc]")
 axis.autolimitaspect = 1
 Makie.lines!(axis, df.x, df.y)

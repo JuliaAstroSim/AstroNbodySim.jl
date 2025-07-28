@@ -158,7 +158,7 @@ end
 function benchmark_DifferencingEquation_1D(NumData;
     savefolder = "output",
     title = "Benchmark of solving 1D differencing equations ($(Threads.nthreads()) CPU threads)",
-    resolution = (800, 600),
+    size = (800, 600),
     kw...
 )
     Functions = [
@@ -190,7 +190,7 @@ function benchmark_DifferencingEquation_1D(NumData;
 
     fig, df = benchmarkplot(
         Functions, Names, gen, NumData;
-        savefolder, title, resolution,
+        savefolder, title, size,
         legend = false,
         kw...
     )
@@ -210,7 +210,7 @@ end
 function benchmark_DifferencingEquation_2D(NumData;
     savefolder = "output",
     title = "Benchmark of solving 2D differencing equations ($(Threads.nthreads()) CPU threads)",
-    resolution = (800, 600),
+    size = (800, 600),
     kw...
 )
     Functions = [
@@ -242,7 +242,7 @@ function benchmark_DifferencingEquation_2D(NumData;
 
     fig, df = benchmarkplot(
         Functions, Names, gen, NumData;
-        savefolder, title, resolution,
+        savefolder, title, size,
         legend = false,
         kw...
     )
@@ -262,7 +262,7 @@ end
 function benchmark_DifferencingEquation_3D(NumData;
     savefolder = "output",
     title = "Benchmark of solving 3D differencing equations ($(Threads.nthreads()) CPU threads)",
-    resolution = (800, 600),
+    size = (800, 600),
     kw...
 )
     Functions = [
@@ -294,7 +294,7 @@ function benchmark_DifferencingEquation_3D(NumData;
 
     fig, df = benchmarkplot(
         Functions, Names, gen, NumData;
-        savefolder, title, resolution,
+        savefolder, title, size,
         legend = false,
         kw...
     )

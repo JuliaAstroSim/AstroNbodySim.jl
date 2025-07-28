@@ -5,7 +5,7 @@ function plot_plummer(sim::Simulation, mode)
     # Plot profiling
     fig = plot_profiling(joinpath(sim.config.output.dir, "timing.csv"),
         title = "Profiling of " * mode,
-        resolution = (1600,900),
+        size = (1600,900),
     )
     Makie.save("output/Plummer/Profiling-$(mode).png", fig)
 

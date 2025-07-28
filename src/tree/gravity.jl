@@ -368,7 +368,7 @@ function compute_local_force_at_points(sim::Simulation, SoftLength::Number, Grav
                                     )
 end
 
-function compute_force(sim::Simulation, pos::Union{Array{T,1}, T}, SoftLength::Number, GravSolver::Tree, Device::CPU) where T<:AbstractPoint3D
+function compute_force(sim::Simulation, pos::Union{Array{T,N}, T}, SoftLength::Number, GravSolver::Tree, Device::CPU) where T<:AbstractPoint3D where N
     bcast(sim.simdata.tree, :recvbuffer, Dict(1 => pos))
     bcast(sim, compute_local_force_at_points, args = (SoftLength, GravSolver, Device))
 

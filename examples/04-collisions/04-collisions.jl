@@ -80,13 +80,13 @@ run(gpu)
 
 # Plot
 plot_positionslice(gpu.config.output.dir, "snapshot_", collect(0:100), ".gadget2", gadget2(),
-    dpi = 300, resolution = (400,400),
+    size = (400,400),
     xlims = (-200.0, +200.0), ylims = (-200.0, +200.0),
     times = collect(0.0:0.03:3.0) * u"Gyr",
     collection = DISK,
     markersize = 2.0,
 )
-plt = mosaicview(gpu.config.output.dir, "pos_", collect(1:9:100), ".png"; fillvalue = 0.5, npad = 3, ncol = 4, rowmajor = true);
+plt = mosaic(gpu.config.output.dir, "pos_", collect(1:9:100), ".png"; fillvalue = 0.5, npad = 3, ncol = 4, rowmajor = true);
 save("output/mosaic-collision-DirectSumAdaptiveGPU.png", plt)
 
 # write success flag for shell

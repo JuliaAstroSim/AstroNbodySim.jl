@@ -10,6 +10,32 @@ function preprocessdata(sim::Simulation, ::DirectSum, ::GPU)
     preferunits(sim.config.units)
 end
 
+function preprocessdata(sim::Simulation, ::ML, ::GPU)
+    sim.config.solver.data.u = UnitProjection(sim.simdata)
+
+    if isempty(sim.config.solver.data.tstate.model.layers)
+        error("Calling ML solver without model defined (`config.solver.data.model`)")
+    else
+        if isnothing(sim.config.solver.data.best_parameters)
+            @info "Calling ML solver without trained model. Train a new model?"
+            str = Base.prompt("[Y]/N?") in ("","y","Y") ? "Y" : "N"
+            println("Got input: $str")
+            if str == "Y"
+                @info "Training a new model:"
+                println(sim.config.solver.data.model)
+
+                #TODO
+            else
+                error("Canceled by user.")
+            end
+        end
+    end
+end
+
+function preprocessdata(sim::Simulation, ::ML, ::CPU)
+    @warn "ML model on CPU is not encouraged! Try use keyword `device = GPU()`"
+end
+
 """
 $TYPEDSIGNATURES
 This function does all the work for you:
@@ -78,18 +104,28 @@ function run(sim::Simulation)
         begin_timer(sim, "DRIFT")
         begin_timer(sim, "KICK")
         begin_timer(sim, "ANALYSIS")
+        begin_timer(sim, "POSTSTEP")
         begin_timer(sim, "OUTPUT")
         begin_timer(sim, "PLOT")
         
         # force computation, time integration, logging of various types of simulation
         step(sim, GravSolver, Device) 
 
-        # Do whatever you want with the entire data of simulation !!!
+        # Analyse the simulation state
         t_ANALYSIS = time_ns()
         if !isempty(sim.loginfo.analysers)
             push!(analysis, write_analysis(sim))
         end
         add_timer(sim, "ANALYSIS", t_ANALYSIS, time_ns())
+
+        # Post-step: do whatever you want with the entire data of simulation !!!
+        t_POSTSTEP = time_ns()
+        if !isempty(sim.poststep)
+            for ps in sim.poststep
+                ps(sim)
+            end
+        end
+        add_timer(sim, "POSTSTEP", t_POSTSTEP, time_ns())
         
         # Plot
         if sim.visinfo.Realtime && time() - sim.visinfo.last_plot_time > sim.visinfo.RenderTime

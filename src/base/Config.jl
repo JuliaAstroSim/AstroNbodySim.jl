@@ -194,6 +194,41 @@ end
 
 ##### SolverConfig #####
 
+struct UnitProjection
+    L
+    T
+    G
+    M
+end
+
+"""
+Construct without initialization
+"""
+function UnitProjection(units)
+    return UnitProjection(
+        1.0*getuLength(units),
+        1.0*getuTime(units),
+        1.0*getuLength(units)^3 / getuMass(units) / getuTime(units)^2,
+        1.0*getuMass(units),
+    )
+end
+
+function UnitProjection(m::MeshCartesianStatic)
+    L = m.config.Max[1] - m.config.Min[1]
+    M = mean(m.rho) * L^m.config.dim
+    G = Constant(m.config.units).G
+    T = sqrt(L^3 / (4π*G*M))
+    return UnitProjection(L, T, G, M)
+end
+
+mutable struct DataML
+    u::UnitProjection
+    tstate
+    best_parameters
+    dev_cpu
+    dev_gpu
+end
+
 """
 $(TYPEDEF)
 
@@ -204,6 +239,9 @@ struct SolverConfig{SolverG #=, SolverH=#}
     grav::SolverG
     #"Hydrodynamical force solver. Supported: `SPH`, `MHD`, `FEM`, `FVM`"
     #hydro::SolverH
+
+    "Data specialized for the solver"
+    data
 end
 
 """
@@ -215,9 +253,11 @@ function SolverConfig(;
 
     # Keywords to override
     grav::Gravity = GravitySolver,
+    data = nothing,
 )
     return SolverConfig(
         grav,
+        data,
     )
 end
 
@@ -528,8 +568,30 @@ function SimConfig( ;
     EnlargeMesh::Float64 = 2.01,
     BoundaryCondition::BoundaryCondition = Vacuum(),
     sparse::Bool = true,
-)
     
+    # ML
+    cnn_model = nothing,
+    cnn_parameters = nothing,
+    learning_rate = 0.001f0,
+    optimiser = Optimisers.Adam,
+    solverdata = nothing,
+)
+    # Construct here and initialize in Simulation
+    if GravitySolver isa ML
+        if !isnothing(cnn_model)
+            model = cnn_model
+        else
+            model = Chain()
+        end
+        opt = optimiser(learning_rate)
+        tstate = Lux.Experimental.TrainState(MersenneTwister(), model, opt)
+
+        if !isnothing(cnn_parameters)
+            tstate = setproperties!!(tstate, parameters = gpu_device()(cnn_parameters))
+        end
+        solverdata = DataML(UnitProjection(units), tstate, cpu_device(), cnn_parameters, gpu_device())
+    end
+
     return SimConfig(
         name, author, daytime,
         floattype,
@@ -546,6 +608,7 @@ function SimConfig( ;
         ),
         SolverConfig(;
             GravitySolver,
+            data = solverdata,
         ),
         GravityConfig(;
             ForceSofteningTable = MVector{length(ForceSofteningTable)}(ForceSofteningTable),
@@ -586,8 +649,9 @@ DefaultTimer = Dict(
        "DRIFT" => 3,
         "KICK" => 4,
     "ANALYSIS" => 5,
-      "OUTPUT" => 6,
-        "PLOT" => 7,
+    "POSTSTEP" => 6,
+      "OUTPUT" => 7,
+        "PLOT" => 8,
 )
 
 """
@@ -796,7 +860,7 @@ mutable struct VisualizationInfo
     progress::Progress
 
     PlotData
-    resolution
+    size
     fig
 
     Realtime::Bool
@@ -816,7 +880,7 @@ $(TYPEDSIGNATURES)
 function VisualizationInfo(;
         Realtime::Bool = false,
         RenderTime::Float64 = 0.2,
-        resolution = (1000, 1000),
+        size = (1000, 1000),
         xlims = nothing,
         ylims = nothing,
         zlims = nothing,
@@ -826,7 +890,7 @@ function VisualizationInfo(;
         Progress(0),
 
         nothing,
-        resolution,
+        size,
         nothing,
 
         Realtime, RenderTime, 0.0,
@@ -867,8 +931,9 @@ struct Simulation{D}
     "`::Buffer`"
     buffer
 
-    bgforce::Vector{Function}
-    bgpotential::Vector{Function}
+    bgforce
+    bgpotential
+    poststep
 end
 
 function Base.show(io::IO, sim::Simulation)
@@ -912,7 +977,7 @@ function Simulation(d;
     # VisualizationInfo
     Realtime::Bool = false,
     RenderTime::Float64 = 0.2,
-    resolution = (1000, 1000),
+    size = (1000, 1000),
 
     xlims = nothing,
     ylims = nothing,
@@ -922,6 +987,7 @@ function Simulation(d;
     # background fields
     bgforce = Function[],
     bgpotential = Function[],
+    poststep = Function[],
 
     # Tree method
     TreeOpenAngle = 0.1,
@@ -955,6 +1021,7 @@ function Simulation(d;
     zMin = nothing,
     zMax = nothing,
     device = CPU(),
+    data_on_cpu = false,
     EnlargeMesh = 2.01,
     BoundaryCondition = Vacuum(),
 
@@ -980,11 +1047,11 @@ function Simulation(d;
                         PhysicsInfo(),
                         StreamInfo(),
                         VisualizationInfo(;
-                            Realtime = $Realtime, RenderTime = $RenderTime, resolution = $resolution,
+                            Realtime = $Realtime, RenderTime = $RenderTime, size = $size,
                             xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
                         ),
                         AstroNbodySim.Buffer($config),
-                        $bgforce, $bgpotential,
+                        $bgforce, $bgpotential, $poststep,
                     )))
             end
             if !haskey(registry, id) # Master is not in pids, init empty data
@@ -996,9 +1063,9 @@ function Simulation(d;
                     LogInfo(; timers, analysers),
                     PhysicsInfo(),
                     StreamInfo(),
-                    VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+                    VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                     AstroNbodySim.Buffer(config),
-                    bgforce, bgpotential,
+                    bgforce, bgpotential, poststep,
                 )
             end
             @info "Data cuts: " * string(gather(registry[id], numlocal))
@@ -1014,9 +1081,9 @@ function Simulation(d;
                     LogInfo(; timers, analysers),
                     PhysicsInfo(),
                     StreamInfo(),
-                    VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+                    VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                     AstroNbodySim.Buffer(config),
-                    bgforce, bgpotential,
+                    bgforce, bgpotential, poststep,
                 )
             end
         end
@@ -1049,11 +1116,11 @@ function Simulation(d;
             PhysicsInfo(),
             StreamInfo(),
             VisualizationInfo(;
-                Realtime = $Realtime, RenderTime = $RenderTime, resolution = $resolution,
+                Realtime = $Realtime, RenderTime = $RenderTime, size = $size,
                 xlims = $(xlims), ylims = $(ylims), zlims = $(zlims), markersize = $(markersize),
             ),
             AstroNbodySim.Buffer($config),
-            $bgforce, $bgpotential,
+            $bgforce, $bgpotential, $poststep,
         )
 
         if !haskey(registry, id) # Master is not in pids, init empty data
@@ -1065,13 +1132,13 @@ function Simulation(d;
                 LogInfo(; timers, analysers),
                 PhysicsInfo(),
                 StreamInfo(),
-                VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+                VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
                 AstroNbodySim.Buffer(config),
-                bgforce, bgpotential,
+                bgforce, bgpotential, poststep,
             )
         end
         @info "Data cuts: " * string(gather(registry[id], numlocal))
-    elseif config.solver.grav isa FDM || config.solver.grav isa FFT
+    elseif config.solver.grav isa FDM || config.solver.grav isa FFT || config.solver.grav isa ML
         @info "Setting up $(traitstring(config.solver.grav)) simulation..."
         dStruct = StructArray(d)
         mesh = MeshCartesianStatic(dStruct, units;
@@ -1080,9 +1147,12 @@ function Simulation(d;
             Nx, Ny, Nz, NG,
             xMin, xMax, yMin, yMax, zMin, zMax,
             mode = meshmode,
-            gpu = device isa GPU ? true : false,
+            device, data_on_cpu,
             enlarge = EnlargeMesh,
         )
+        if config.solver.grav isa ML
+            config.solver.data.u = UnitProjection(mesh)
+        end
         registry[id] = Simulation(
             config, id, pids,
             mesh,
@@ -1091,9 +1161,9 @@ function Simulation(d;
             LogInfo(; timers, analysers),
             PhysicsInfo(),
             StreamInfo(),
-            VisualizationInfo(; Realtime, RenderTime, resolution, xlims, ylims, zlims, markersize),
+            VisualizationInfo(; Realtime, RenderTime, size, xlims, ylims, zlims, markersize),
             AstroNbodySim.Buffer(config),
-            bgforce, bgpotential,
+            bgforce, bgpotential, poststep,
         )
     elseif config.solver.grav isa ML
     end
@@ -1121,7 +1191,7 @@ function get_local_data(sim::Simulation, ::Tree, ::CPU)
     return sim.simdata.tree.data
 end
 
-function get_local_data(sim::Simulation, ::Union{FDM, FFT}, ::DeviceType)
+function get_local_data(sim::Simulation, ::Union{FDM, FFT, ML}, ::DeviceType)
     return sim.simdata.data
 end
 
@@ -1150,7 +1220,7 @@ function get_all_data(sim::Simulation, ::Union{DirectSum, Tree}, ::CPU)
     return d
 end
 
-function get_all_data(sim::Simulation, ::Union{FDM, FFT}, ::CPU)
+function get_all_data(sim::Simulation, ::Union{FDM, FFT, ML}, ::CPU)
     return sim.simdata.data
 end
 
@@ -1160,7 +1230,7 @@ function get_all_data(sim::Simulation, ::DirectSum, ::GPU)
 end
 
 "Copy data to CPU"
-function get_all_data(sim::Simulation, ::Union{FDM, FFT}, ::GPU)
+function get_all_data(sim::Simulation, ::Union{FDM, FFT, ML}, ::GPU)
     CUDA.@allowscalar return StructArray(Array(sim.simdata.data))
 end
 
@@ -1194,4 +1264,8 @@ function check_compatibility(config::SimConfig)
     check_QUMOND(config)
     check_tree(config)
     check_mesh(config)
+end
+
+function empty_function(sim::Simulation)
+    # Do nothing
 end

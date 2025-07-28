@@ -3,7 +3,7 @@ module AstroNbodySim
 
 __precompile__(true)
 
-using Reexport
+# using Reexport
 using PrecompileTools
 
 # basic
@@ -17,6 +17,8 @@ using DataFrames
 using DocStringExtensions
 using Base.Iterators
 using Measurements
+using JLD2
+using Random
 
 # user-friendly
 using Unitful, UnitfulAstro
@@ -45,18 +47,22 @@ using GLMakie
 using LoopVectorization
 
 # Machine Learning
-# using Knet
+# using Lux, LuxCUDA
+using MLUtils
+using Optimisers
 using Images
 using Zygote
 
 # JuliaAstroSim
 using ParallelOperations
-@reexport using PhysicalParticles
-@reexport using PhysicalMeshes
-@reexport using PhysicalTrees
-@reexport using AstroIO
-@reexport using PhysicalFDM
-@reexport using AstroSimBase
+using AstroSimBase
+using PhysicalParticles
+using PhysicalMeshes
+using PhysicalTrees
+using AstroIO
+using PhysicalFDM
+using PhysicalFFT
+using PhysicalParticles.NumericalIntegration
 
 # GPU
 using CUDA
@@ -137,8 +143,8 @@ export
     delta_mat2,
     delta_mat3,
     laplace_conv_op, laplace_conv,
-    fft_poisson, fft_poisson!,
     fdm_poisson,
+    compute_acc,
 
     # ML
     # train_cnn_poisson2d,
@@ -249,14 +255,11 @@ include("directsumgpu/gravity.jl")
 include("directsumgpu/timestep.jl")
 
 include("PM/gravity.jl")
-include("PM/fft.jl")
-include("PM/cnn.jl")
 include("PM/output.jl")
 include("PM/timestep.jl")
 
-# include("ML/cnn-poisson/models.jl")
-# include("ML/cnn-poisson/dataset.jl")
-# include("ML/cnn-poisson/train.jl")
+include("ML/training.jl")
+include("ML/gravity.jl")
 
 include("restart.jl")
 include("run.jl")

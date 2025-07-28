@@ -14,7 +14,11 @@ function compute_acc(m::MeshCartesianStatic, dim::Val{3}, mode::VertexMode)
     return nothing
 end
 
-function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT}, Device::DeviceType)
+function compute_acc(m::MeshCartesianStatic)
+    compute_acc(m, Val(m.config.dim), m.config.mode)
+end
+
+function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT, ML}, Device::DeviceType)
     t_FORCE = time_ns()
 
     G = sim.config.constants.G
@@ -26,15 +30,17 @@ function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT}, Device::Dev
         fdm_poisson(m, Val(m.config.dim), G, m.config.mode, Device, m.config.boundary, sim.config.grav.sparse)
     elseif GravSolver isa FFT
         fft_poisson(m, G)
+    elseif GravSolver isa ML
+        cnn_poisson(m, sim.config.solver.data.u, sim.config.solver.data)
     end
     
-    compute_acc(m, Val(m.config.dim), m.config.mode)
+    compute_acc(m)
 
     #TODO background force
 
     # Solve QUMOND on mesh
     if sim.config.grav.model isa QUMOND
-        QUMOND_acc!(m, ACC0, G, Device, sim.config.grav.sparse)
+        QUMOND_acc!(m, ACC0, G)
     end
 
     # Assign acc to inbound particles
@@ -75,6 +81,6 @@ function compute_force(sim::Simulation, GravSolver::Union{FDM, FFT}, Device::Dev
     add_timer(sim, "FORCE", t_FORCE, time_ns())
 end
 
-function compute_force(sim::Simulation, pos::Union{Array{T,1}, T}, SoftLength::Number, GravSolver::Union{FFT,FDM}, Device::CPU) where T<:AbstractPoint3D
-    return mesh2particle.(sim.simdata, pos, :acc, sim.simdata.config.mode, sim.simdata.config.assignment)
+function compute_force(sim::Simulation, pos::Array{T,N}, SoftLength::Number, GravSolver::Union{FFT,FDM}, Device::CPU) where T<:AbstractPoint3D where N
+    return mesh2particle.(Ref(sim.simdata.pos), sim.simdata.config, Ref(sim.simdata.acc), pos, sim.simdata.config.mode, sim.simdata.config.assignment)
 end

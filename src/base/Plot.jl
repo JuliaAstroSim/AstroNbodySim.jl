@@ -4,7 +4,7 @@ function pack_pos(sim::Simulation, ::DirectSum, ::GPU)
     return pack_xyz(d)
 end
 
-function pack_pos(sim::Simulation, ::Union{DirectSum, Tree, FFT, FDM}, ::CPU)
+function pack_pos(sim::Simulation, ::Union{DirectSum, Tree, FFT, FDM, ML}, ::CPU)
     uLength = getuLength(sim.config.units)
     d = StructArray(ustrip.(uLength, get_all_data(sim).Pos))
     return pack_xyz(d)
@@ -23,8 +23,8 @@ function makie_scatter(sim::Simulation, GravSolver::Gravity, Device::DeviceType;
     sim.visinfo.fig = GLMakie.scatter(
         sim.visinfo.PlotData;
         markersize = iszero(sim.visinfo.markersize) ? estimate_markersize(pos) : sim.visinfo.markersize,
-        markerspace=SceneSpace,
-        figure = (resolution = sim.visinfo.resolution,),
+        markerspace=:data,
+        figure = (size = sim.visinfo.size,),
     )
 
     f,a,p = sim.visinfo.fig
