@@ -368,9 +368,23 @@ function compute_local_force_at_points(sim::Simulation, SoftLength::Number, Grav
                                     )
 end
 
+# Julia 1.12 might have sync bug
+function compute_local_force_at_points_no_recv(sim::Simulation, pos, SoftLength::Number, GravSolver::Tree, Device::CPU)
+    tree = sim.simdata.tree
+    # pos = tree.recvbuffer[1]
+    tree.sendbuffer[1] = compute_local_force_at_point_kernel.(pos, tree,
+                                    sim.simdata.treesimconfig.TreeOpenAngle,
+                                    sim.config.constants.G,
+                                    SoftLength,
+                                    sim.config.ZeroValues.acc,
+                                    )
+end
+
 function compute_force(sim::Simulation, pos::Union{Array{T,N}, T}, SoftLength::Number, GravSolver::Tree, Device::CPU) where T<:AbstractPoint3D where N
-    bcast(sim.simdata.tree, :recvbuffer, Dict(1 => pos))
-    bcast(sim, compute_local_force_at_points, args = (SoftLength, GravSolver, Device))
+    # @sync bcast(sim.simdata.tree, :recvbuffer, Dict(1 => pos))
+    # @sync bcast(sim, compute_local_force_at_points, args = (SoftLength, GravSolver, Device))
+
+    bcast(sim, compute_local_force_at_points_no_recv, args = (pos, SoftLength, GravSolver, Device))
 
     results = gather(sim.simdata.tree, :sendbuffer)
     acc = results[1][1]

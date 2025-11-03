@@ -173,9 +173,15 @@ function compute_local_force_at_points(sim::Simulation, SoftLength::Number, Grav
     sim.buffer.sendbuffer[1] = compute_force_at_point.(pos, sim, SoftLength)
 end
 
+function compute_local_force_at_points_no_recv(sim::Simulation, pos, SoftLength::Number, GravSolver::DirectSum, Device::CPU)
+    sim.buffer.sendbuffer[1] = compute_force_at_point.(pos, sim, SoftLength)
+end
+
 function compute_force(sim::Simulation, pos::Union{Array{T,N}, T}, SoftLength::Number, GravSolver::DirectSum, Device::CPU) where T<:AbstractPoint3D where N
-    bcast(sim, :buffer, :recvbuffer, Dict(1 => pos))
-    bcast(sim, compute_local_force_at_points, args = (SoftLength, GravSolver, Device))
+    # bcast(sim, :buffer, :recvbuffer, Dict(1 => pos))
+    # bcast(sim, compute_local_force_at_points, args = (SoftLength, GravSolver, Device))
+
+    bcast(sim, compute_local_force_at_points_no_recv, args = (pos, SoftLength, GravSolver, Device))
 
     results = gather(sim, :buffer, :sendbuffer)
     acc = results[1][1]
