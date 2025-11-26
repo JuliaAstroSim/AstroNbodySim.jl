@@ -75,3 +75,4 @@ examples/16-galaxies/dice_spiral.params.*
 *.param-usedvalues
 examples/16-galaxies/forcetest.dat
 Benchmark/thread_time.dat
+examples/08-TrajectoryLookback/output*

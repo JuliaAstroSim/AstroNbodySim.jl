@@ -3,6 +3,11 @@
 #    and converted to Galactocentric coordinates using astropy.
 # The parameters of LMC are from vasiliev2021tango_MNRAS - Tango for three sagittarius, LMC, and the milky way
 
+#=
+cd("E:\\JuliaAstroSim\\AstroNbodySim.jl\\examples\\08-TrajectoryLookback")
+include("08-TrajectoryLookback.jl")
+=#
+
 using Unitful, UnitfulAstro
 using StructArrays
 using DataFrames, CSV
@@ -21,10 +26,17 @@ df_MW_satellites = AstroIC.load_data_MW_satellites()  # load from src/data/MW_sa
 
 ##### General parameters
 
-Np = 1000
-# Np = 5000
-# Np = 10000
-# Np = 50000
+# outputdir = joinpath(@__DIR__, "output")
+# Np = 1000
+# Np_LMC = 200
+
+outputdir = joinpath(@__DIR__, "output_high_res")
+Np = 50000
+Np_LMC = 1000
+
+SofteningLength = 0.1u"kpc"
+
+
 GravitySolver = Tree()
 # GravitySolver = DirectSum()
 pids = [1]
@@ -34,12 +46,10 @@ TimeStep = 0.0u"Gyr"  # adaptive if zero.
 # TimeStep = 1e-5u"Gyr"
 TimeBetweenSnapshots = 0.1u"Gyr"
 
-file_LMC = joinpath(@__DIR__, "output/LMC_traj_lookback_Vasiliev2021", "analysis.csv")
+file_LMC = joinpath(outputdir, "LMC_traj_lookback_Vasiliev2021", "analysis.csv")
 flag_load_LMC = false    # If false, re-compute the trajectory of LMC
 # flag_load_LMC = true   # If true and the file exists, skip trajectory lookback of LMC
-Np_LMC = 200
-# Np_LMC = 1000
-# Np_LMC = 10000
+
 
 ##### Initialize MW model
 @info "Initializing MW's baryons"
@@ -73,7 +83,7 @@ spl_pot = Spline1D(ustrip.(u"kpc", MW_table_r), ustrip.(u"kpc^2/Gyr^2", MW_table
 
 ### MW background force without LMC
 function MW_bg_force(p::AbstractParticle, t;
-    SofteningLength = 0.01u"kpc",
+    SofteningLength = SofteningLength,
     GravitySolver = Tree(),
     # GravitySolver = DirectSum(),
     sim_force_baryon = sim_force_baryon,
@@ -95,53 +105,53 @@ analysers = Dict(
 )
 
 
-
 ##### LMC
 if flag_load_LMC && isfile(file_LMC)
     @info "Loading LMC trajectory from $(file_LMC)"
     df_traj_LMC = DataFrame(CSV.File(file_LMC));
 else
     @info "Simulating LMC..."
-    ### Vasiliev 2021
-    model_LMC = tNFW(5.2629e6u"Msun/kpc^3", 8.5u"kpc" * 1.38^0.6, 85u"kpc" * 1.38^0.6)
-    config_LMC = SphericalSystem(STAR, Np_LMC,
-        x -> GalacticDynamics.density(model_LMC, x) * 4π * x^2,
-    )
-    particles_LMC = generate(config_LMC;
-        MaxRadius = 85.0u"kpc" * 1.38^0.6 * 1.5,
-    );
-    particles_LMC.Mass .= 1.38e11u"Msun"/Np_LMC; # make sure the total mass is 1.38e11 Msun
+    let
+        ### Vasiliev 2021
+        tidal_initial_pos = PVector(-0.6, -41.3, -27.1, u"kpc") # Galactocentric
+        tidal_initial_vel = -PVector(-63.9, -213.8, 206.6, u"km/s") #? Negative for lookback
 
+        test_particles = StructArray([
+            Star(uAstro; id = 1),
+        ])
+        test_particles.Pos[1] = tidal_initial_pos
+        test_particles.Vel[1] = tidal_initial_vel
 
-    tidal_initial_pos = PVector(-0.6, -41.3, -27.1, u"kpc") # Galactocentric
-    tidal_initial_vel = -PVector(-63.9, -213.8, 206.6, u"km/s") #? Negative for lookback
+        sim_traj_lookback = Simulation(
+            deepcopy(test_particles);
+            bgforce = Function[MW_bg_force],
+            analysers,
+            TimeEnd = 6.0u"Gyr",
+            TimeStep = 0.0u"Gyr",  # adaptive if zero.
+            # TimeStep = 1e-5u"Gyr",
+            TimeBetweenSnapshots = 0.1u"Gyr",
+            Realtime = false,
+            OutputDir = joinpath(outputdir, "LMC_traj_lookback_Vasiliev2021"),
+        );
+        run(sim_traj_lookback);
+    end
 
-    test_particles = StructArray([
-        Star(uAstro; id = 1),
-    ])
-    test_particles.Pos[1] = tidal_initial_pos
-    test_particles.Vel[1] = tidal_initial_vel
-
-    sim_traj_lookback = Simulation(
-        deepcopy(test_particles);
-        bgforce = Function[MW_bg_force],
-        analysers,
-        TimeEnd = 6.0u"Gyr",
-        TimeStep = 0.0u"Gyr",  # adaptive if zero.
-        # TimeStep = 1e-5u"Gyr",
-        TimeBetweenSnapshots = 0.1u"Gyr",
-        Realtime = false,
-        OutputDir = "output/LMC_traj_lookback_Vasiliev2021",
-    );
-    run(sim_traj_lookback);
-
-
-    df_traj_LMC = DataFrame(CSV.File(joinpath("output/LMC_traj_lookback_Vasiliev2021", "analysis.csv")));
+    df_traj_LMC = DataFrame(CSV.File(joinpath(outputdir, "LMC_traj_lookback_Vasiliev2021", "analysis.csv")));
 end
+
+### Vasiliev 2021
+model_LMC = tNFW(5.2629e6u"Msun/kpc^3", 8.5u"kpc" * 1.38^0.6, 85u"kpc" * 1.38^0.6)
+config_LMC = SphericalSystem(STAR, Np_LMC,
+    x -> GalacticDynamics.density(model_LMC, x) * 4π * x^2,
+)
+particles_LMC = generate(config_LMC;
+    MaxRadius = 85.0u"kpc" * 1.38^0.6 * 1.5,
+);
+particles_LMC.Mass .= 1.38e11u"Msun"/Np_LMC; # make sure the total mass is 1.38e11 Msun
 
 
 function MW_bg_force_LMC(p::AbstractParticle, t;
-    SofteningLength = 0.01u"kpc",
+    SofteningLength = SofteningLength,
     GravitySolver = Tree(),
     # GravitySolver = DirectSum(),
     sim_force_baryon = sim_force_baryon,
@@ -186,7 +196,7 @@ end
         TimeStep,
         TimeBetweenSnapshots,
         Realtime = false,
-        OutputDir = joinpath(@__DIR__, "output/traj_lookback_$(df_MW_satellites.Galaxy[i])_no_LMC"),
+        OutputDir = joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[i])_no_LMC"),
     );
     run(sim_traj_lookback);
 
@@ -209,10 +219,101 @@ end
         TimeStep,
         TimeBetweenSnapshots,
         Realtime = false,
-        OutputDir = joinpath(@__DIR__, "output/traj_lookback_$(df_MW_satellites.Galaxy[i])_with_LMC"),
+        OutputDir = joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[i])_with_LMC"),
     );
     run(sim_traj_lookback);
 
     #TODO release memory of simulations
 end
 
+
+##### Plot Trajectories
+
+@showprogress for i in eachindex(df_MW_satellites.Galaxy)
+    Tmax = 6
+
+    df_no_LMC = DataFrame(CSV.File(joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[i])_no_LMC/analysis.csv")))
+    df_with_LMC = DataFrame(CSV.File(joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[i])_with_LMC/analysis.csv")))
+
+    fig = Figure(; size = (400, 400))
+    ax = Axis(fig[1,1];
+        title = "$(df_MW_satellites.Galaxy[i])",
+        xlabel = "t [Gyr]",
+        ylabel = "r [kpc]",
+        xminorticksvisible = true,
+        xminorgridvisible = true,
+        yminorticksvisible = true,
+        yminorgridvisible = true,
+        xminorticks = IntervalsBetween(10),
+        yminorticks = IntervalsBetween(10),
+    )
+    Makie.xlims!(ax, -Tmax, 0)
+
+    r = sqrt.(df_no_LMC.x.^2 + df_no_LMC.y.^2 + df_no_LMC.z.^2)
+    l1 = Makie.lines!(ax, -df_no_LMC.time, r; color = :blue)
+
+    r = sqrt.(df_with_LMC.x.^2 + df_with_LMC.y.^2 + df_with_LMC.z.^2)
+    l2 = Makie.lines!(ax, -df_with_LMC.time, r; color = :red)
+
+    Makie.save(joinpath(outputdir, "traj_lookback_radius_$(df_MW_satellites.Galaxy[i]).png"), fig)
+end
+
+let
+    Tmax = 6
+
+    fig = Figure(; size = (2000, 2400))
+    @showprogress for i in 1:5, j in 1:6
+        id = i + (j-1) * 5
+        df_no_LMC = DataFrame(CSV.File(joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[id])_no_LMC/analysis.csv")))
+        df_with_LMC = DataFrame(CSV.File(joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[id])_with_LMC/analysis.csv")))
+
+        ax = Axis(fig[j,i];
+            title = "$(df_MW_satellites.Galaxy[id])",
+            xlabel = "t [Gyr]",
+            ylabel = "r [kpc]",
+            xminorticksvisible = true,
+            xminorgridvisible = true,
+            yminorticksvisible = true,
+            yminorgridvisible = true,
+            xminorticks = IntervalsBetween(10),
+            yminorticks = IntervalsBetween(10),
+        )
+        Makie.xlims!(ax, -Tmax, 0)
+
+        r = sqrt.(df_no_LMC.x.^2 + df_no_LMC.y.^2 + df_no_LMC.z.^2)
+        l1 = Makie.lines!(ax, -df_no_LMC.time, r; color = :blue)
+
+        r = sqrt.(df_with_LMC.x.^2 + df_with_LMC.y.^2 + df_with_LMC.z.^2)
+        l2 = Makie.lines!(ax, -df_with_LMC.time, r; color = :red)
+    end
+    Makie.save(joinpath(outputdir, "traj_lookback_radius_1_30.png"), fig)
+    Makie.save(joinpath(outputdir, "E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_1_30.png"), fig)
+
+    fig = Figure(; size = (2000, 2400))
+    @showprogress for i in 1:5, j in 1:6
+        id = i + (j-1) * 5 + 30
+        df_no_LMC = DataFrame(CSV.File(joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[id])_no_LMC/analysis.csv")))
+        df_with_LMC = DataFrame(CSV.File(joinpath(outputdir, "traj_lookback_$(df_MW_satellites.Galaxy[id])_with_LMC/analysis.csv")))
+
+        ax = Axis(fig[j,i];
+            title = "$(df_MW_satellites.Galaxy[id])",
+            xlabel = "t [Gyr]",
+            ylabel = "r [kpc]",
+            xminorticksvisible = true,
+            xminorgridvisible = true,
+            yminorticksvisible = true,
+            yminorgridvisible = true,
+            xminorticks = IntervalsBetween(10),
+            yminorticks = IntervalsBetween(10),
+        )
+        Makie.xlims!(ax, -Tmax, 0)
+
+        r = sqrt.(df_no_LMC.x.^2 + df_no_LMC.y.^2 + df_no_LMC.z.^2)
+        l1 = Makie.lines!(ax, -df_no_LMC.time, r; color = :blue)
+
+        r = sqrt.(df_with_LMC.x.^2 + df_with_LMC.y.^2 + df_with_LMC.z.^2)
+        l2 = Makie.lines!(ax, -df_with_LMC.time, r; color = :red)
+    end
+    Makie.save(joinpath(outputdir, "traj_lookback_radius_31_60.png"), fig)
+    Makie.save(joinpath(outputdir, "E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_31_60.png"), fig)
+end
