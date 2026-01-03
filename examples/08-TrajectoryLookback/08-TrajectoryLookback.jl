@@ -47,8 +47,8 @@ TimeStep = 0.0u"Gyr"  # adaptive if zero.
 TimeBetweenSnapshots = 0.1u"Gyr"
 
 file_LMC = joinpath(outputdir, "LMC_traj_lookback_Vasiliev2021", "analysis.csv")
-flag_load_LMC = false    # If false, re-compute the trajectory of LMC
-# flag_load_LMC = true   # If true and the file exists, skip trajectory lookback of LMC
+# flag_load_LMC = false    # If false, re-compute the trajectory of LMC
+flag_load_LMC = true   # If true and the file exists, skip trajectory lookback of LMC
 
 
 ##### Initialize MW model
@@ -255,6 +255,12 @@ end
     r = sqrt.(df_with_LMC.x.^2 + df_with_LMC.y.^2 + df_with_LMC.z.^2)
     l2 = Makie.lines!(ax, -df_with_LMC.time, r; color = :red)
 
+    spl_x = Spline1D(df_traj_LMC.time, df_traj_LMC.x; k = 1)
+    spl_y = Spline1D(df_traj_LMC.time, df_traj_LMC.y; k = 1)
+    spl_z = Spline1D(df_traj_LMC.time, df_traj_LMC.z; k = 1)
+    r = sqrt.((spl_x(df_with_LMC.time) - df_with_LMC.x).^2 + (spl_y(df_with_LMC.time) - df_with_LMC.y).^2 + (spl_z(df_with_LMC.time) - df_with_LMC.z).^2)
+    l3 = Makie.lines!(ax, -df_with_LMC.time, r; color = :black, linestyle = :dash)
+
     Makie.save(joinpath(outputdir, "traj_lookback_radius_$(df_MW_satellites.Galaxy[i]).png"), fig)
 end
 
@@ -285,9 +291,15 @@ let
 
         r = sqrt.(df_with_LMC.x.^2 + df_with_LMC.y.^2 + df_with_LMC.z.^2)
         l2 = Makie.lines!(ax, -df_with_LMC.time, r; color = :red)
+
+        spl_x = Spline1D(df_traj_LMC.time, df_traj_LMC.x; k = 1)
+        spl_y = Spline1D(df_traj_LMC.time, df_traj_LMC.y; k = 1)
+        spl_z = Spline1D(df_traj_LMC.time, df_traj_LMC.z; k = 1)
+        r = sqrt.((spl_x(df_with_LMC.time) - df_with_LMC.x).^2 + (spl_y(df_with_LMC.time) - df_with_LMC.y).^2 + (spl_z(df_with_LMC.time) - df_with_LMC.z).^2)
+        l3 = Makie.lines!(ax, -df_with_LMC.time, r; color = :black, linestyle = :dash)
     end
     Makie.save(joinpath(outputdir, "traj_lookback_radius_1_30.png"), fig)
-    Makie.save(joinpath(outputdir, "E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_1_30.png"), fig)
+    Makie.save(joinpath("E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_1_30.png"), fig)
 
     fig = Figure(; size = (2000, 2400))
     @showprogress for i in 1:5, j in 1:6
@@ -313,7 +325,57 @@ let
 
         r = sqrt.(df_with_LMC.x.^2 + df_with_LMC.y.^2 + df_with_LMC.z.^2)
         l2 = Makie.lines!(ax, -df_with_LMC.time, r; color = :red)
+
+        spl_x = Spline1D(df_traj_LMC.time, df_traj_LMC.x; k = 1)
+        spl_y = Spline1D(df_traj_LMC.time, df_traj_LMC.y; k = 1)
+        spl_z = Spline1D(df_traj_LMC.time, df_traj_LMC.z; k = 1)
+        r = sqrt.((spl_x(df_with_LMC.time) - df_with_LMC.x).^2 + (spl_y(df_with_LMC.time) - df_with_LMC.y).^2 + (spl_z(df_with_LMC.time) - df_with_LMC.z).^2)
+        l3 = Makie.lines!(ax, -df_with_LMC.time, r; color = :black, linestyle = :dash)
     end
     Makie.save(joinpath(outputdir, "traj_lookback_radius_31_60.png"), fig)
-    Makie.save(joinpath(outputdir, "E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_31_60.png"), fig)
+    Makie.save(joinpath("E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_31_60.png"), fig)
+end
+
+
+let
+    Tmax = df_traj_LMC.time[end]  # Gyr
+
+    fig = Figure(; size = (1200, 400), fontsize = 22)
+    ax = Makie.Axis(fig[1,1];
+        title = "LMC trajectory lookback",
+        xlabel = "t [Gyr]",
+        ylabel = "r [kpc]",
+        xminorticksvisible = true,
+        xminorgridvisible = true,
+        yminorticksvisible = true,
+        yminorgridvisible = true,
+        xminorticks = IntervalsBetween(10),
+        yminorticks = IntervalsBetween(10),
+    )
+    Makie.xlims!(ax, -Tmax, 0)
+    # Makie.ylims!(ax, 0, 30)
+
+    r = sqrt.(df_traj_LMC.x.^2 + df_traj_LMC.y.^2 + df_traj_LMC.z.^2)
+    l1 = Makie.lines!(ax, -df_traj_LMC.time, r; color = :blue)
+    
+    Makie.save(joinpath("output/", "traj_lookback_radius_LMC.png"), fig)
+    Makie.save(joinpath("E:/islentwork/Papers/phd-thesis/islent-phd-thesis/tex/Img/traj_lookback_radius_LMC.png"), fig)
+    Makie.save(joinpath("E:/islentwork/Papers/WaveDM_code/tex", "traj_lookback_radius_LMC.png"), fig)
+    
+    fig
+end
+
+
+let
+    fig = Figure(; size=(1200,600), fontsize=23)
+    ax = Makie.Axis(fig[1,1];)
+    Label(fig[1,1], "test";
+        tellwidth = false,
+        tellheight = false,
+        halign = :left,
+        valign = :bottom,
+        fontsize = 18,
+        padding = (10, 10, 10, 10),
+    )
+    fig
 end
