@@ -260,7 +260,7 @@ function combine_potential(sim::Simulation, ::Tree, ::CPU)
         grav = sim.buffer.potResultRecv[p]
         for i in eachindex(grav)
             index = grav[i].Index
-            data.Potential[index] += grav[i].Potential * data.Mass[index]
+            data.Potential[index] += grav[i].Potential
         end
     end
 

@@ -64,7 +64,7 @@ function run(sim::Simulation)
     @info "Snapshot are saved to " * sim.config.output.dir
 
     # Remove 'stop' file
-    stopfile = joinpath(sim.config.output.dir, "stop") 
+    stopfile = joinpath(sim.config.output.dir, "stop")
     if isfile(stopfile)
         rm(stopfile)
     end
@@ -89,7 +89,38 @@ function run(sim::Simulation)
     # Save initial conditions
     sim.config.output.func(sim, sim.config.output.type)
 
+    # Run main integration loop (shared with `restart`)
+    mainloop(sim)
+
+    ## Leapfrog last half backward kick
+    if sim.config.time.algorithm isa Leapfrog
+        leapfrog_half_kick(sim, -1, GravSolver, Device)
+    end
+
+    # Finish simulation
+    closeloggers(sim)
+    println()
+    println()
+    #@info "Simulation finished"
+end
+
+"""
+$TYPEDSIGNATURES
+Main integration loop: drift → force → kick → analyse → output → repeat
+until `timeinfo.system_time_float >= config.time.End` or the user creates a
+`stop` file inside `config.output.dir`.
+
+Returns a `Matrix` of analyser values if any `analysers` were registered,
+otherwise `nothing`.
+"""
+function mainloop(sim::Simulation)
+    timeinfo = sim.timeinfo
+    config = sim.config
+    GravSolver = config.solver.grav
+    Device = config.device.type
+
     # Analysers
+    analysis = nothing
     if !isempty(sim.loginfo.analysers)
         analysis = []
     end
@@ -107,9 +138,9 @@ function run(sim::Simulation)
         begin_timer(sim, "POSTSTEP")
         begin_timer(sim, "OUTPUT")
         begin_timer(sim, "PLOT")
-        
+
         # force computation, time integration, logging of various types of simulation
-        step(sim, GravSolver, Device) 
+        step(sim, GravSolver, Device)
 
         # Analyse the simulation state
         t_ANALYSIS = time_ns()
@@ -126,7 +157,7 @@ function run(sim::Simulation)
             end
         end
         add_timer(sim, "POSTSTEP", t_POSTSTEP, time_ns())
-        
+
         # Plot
         if sim.visinfo.Realtime && time() - sim.visinfo.last_plot_time > sim.visinfo.RenderTime
             t_PLOT = time_ns()
@@ -167,24 +198,14 @@ function run(sim::Simulation)
         write_timing(sim)
     end
 
-    ## Leapfrog last half backward kick
-    if sim.config.time.algorithm isa Leapfrog
-        leapfrog_half_kick(sim, -1, GravSolver, Device)
-    end
-
-    # Finish simulation
-    closeloggers(sim)
-    println()
-    println()
-    #@info "Simulation finished"
-
-    if !isempty(sim.loginfo.analysers)
+    if analysis !== nothing
         return collect(hcat(analysis...)')
     end
+    return nothing
 end
 
 function restart(sim::Simulation)
     @info "Restarting run"
     restartloggers(sim)
-    mainloop(sim)
+    return mainloop(sim)
 end

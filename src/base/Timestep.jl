@@ -1,18 +1,25 @@
 function get_timestep(acc::AbstractPoint, SofteningLength::Number, TimestepConfig::AdaptiveTimestep)
     ac = norm(acc)
-    dt = sqrt(2 * TimestepConfig.ErrTolTimestep * SofteningLength / ac) #TODO: what if SofteningLength == 0?
+    # Guard against zero/NaN acceleration or zero softening
+    if !isfinite(ac) || ac == 0
+        throw(ArgumentError("get_timestep: non-finite or zero acceleration $(ac); cannot derive dt"))
+    end
+    if SofteningLength <= 0
+        throw(ArgumentError("get_timestep: non-positive softening length $(SofteningLength)"))
+    end
+    dt = sqrt(2 * TimestepConfig.ErrTolTimestep * SofteningLength / ac)
 
     if dt > TimestepConfig.MaxStep
         dt = TimestepConfig.MaxStep
     end
 
     if dt < TimestepConfig.MinStep
-        error("Timestep < MinStep = ", TimestepConfig.MinStep, #=", particle = ", p,=# ", dt = ", dt)
+        throw(ErrorException("Timestep $(dt) < MinStep = $(TimestepConfig.MinStep); particle is in too-strong a field. Consider increasing the softening length or decreasing `MinStep`."))
     end
 
     ti_step = dt / TimestepConfig.TimeInterval
-    if ti_step <= 0 #|| ti_step > TimestepConfig.TimeBase
-        error("Wrong integer timestep: ", ti_step, #=", p = ", p=#)
+    if ti_step <= 0 || !isfinite(ti_step)
+        throw(ErrorException("Wrong integer timestep: $(ti_step). Check TimeInterval=$(TimestepConfig.TimeInterval) and dt=$(dt)."))
     end
 
     ti_min = TimestepConfig.TimeBase

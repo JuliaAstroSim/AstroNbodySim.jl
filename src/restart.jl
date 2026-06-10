@@ -1,14 +1,15 @@
 function saverestart(sim::Simulation, ::Union{DirectSum, Tree}, ::CPU)
-    if !(sim.id.first in sim.pids)
+    if sim.id.first in sim.pids
+        @everywhere sim.pids Main.AstroNbodySim.FileIO.save(
+            joinpath($(sim.config.output.dir), "restart.$(Main.AstroNbodySim.Distributed.myid()).jld2"),
+            Dict("sim" => Main.AstroNbodySim.registry[$(sim.id)])
+        )
+    else
         @everywhere sim.id.first Main.AstroNbodySim.FileIO.save(
             joinpath($(sim.config.output.dir), "restart.$(Main.AstroNbodySim.Distributed.myid()).jld2"),
             Dict("sim" => Main.AstroNbodySim.registry[$(sim.id)])
         )
     end
-    @everywhere sim.pids Main.AstroNbodySim.FileIO.save(
-        joinpath($(sim.config.output.dir), "restart.$(Main.AstroNbodySim.Distributed.myid()).jld2"),
-        Dict("sim" => Main.AstroNbodySim.registry[$(sim.id)])
-    )
 end
 
 function saverestart(sim::Simulation, ::DirectSum, ::GPU)
@@ -45,16 +46,21 @@ function redistribute_data(sim::Simulation, ::Tree)
     newtreeid = Main.PhysicalTrees.next_treeid()
     sim.simdata.tree.id = newtreeid
 
-    @everywhere sim.pids PhysicalTrees.registry[$(newtreeid)] = AstroNbodySim.registry[$(sim.id)].tree
+    # Bug fix: the tree lives in `PhysicalTrees.registry`, not as a top-level
+    # `tree` field of the `Simulation` struct. Use `simdata.tree` to access it
+    # on every worker. The previous code accessed `AstroNbodySim.registry[id].tree`
+    # which is invalid (Simulation has no `tree` field).
+    @everywhere sim.pids begin
+        PhysicalTrees.registry[$(newtreeid)] = AstroNbodySim.registry[$(sim.id)].simdata.tree
+        PhysicalTrees.registry[$(newtreeid)].id = $(newtreeid)
+        PhysicalTrees.registry[$(newtreeid)].pids = $(sim.pids)
+    end
 
-    # Check the holder
+    # Make sure the local process also has an entry (when myid() is the master and not in pids)
     if !haskey(Main.PhysicalTrees.registry, newtreeid)
         Core.eval(Main.PhysicalTrees, :(registry[newtreeid] = $(sim.simdata.tree)))
     end
-
     sim.simdata.tree.pids = sim.pids
-    bcast(sim.simdata.tree, :id, :newtreeid)
-    bcast(sim.simdata.tree, :pids, sim.pids)
     rebuild(sim.simdata.tree)
 end
 

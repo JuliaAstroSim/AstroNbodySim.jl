@@ -11,12 +11,10 @@ $(TYPEDSIGNATURES)
 Sum kinetic energy: `0.5 * data.Mass[i] * data.Vel[i] * data.Vel[i]`
 """
 function total_kinetic(data::StructArray)
-    s = similar(data.Potential) .* zero(data.Mass[1])
-    Threads.@threads for k in 1:Threads.nthreads()
-        Head, Tail = split_block(length(data), k, Threads.nthreads())
-        for i in Head:Tail
-            @inbounds s[i] = 0.5 * data.Mass[i] * data.Vel[i] * data.Vel[i]
-        end
+    T = typeof(zero(data.Mass[1]) * zero(data.Vel[1] * data.Vel[1]))
+    s = similar(data.Potential, T)
+    Threads.@threads :static for i in eachindex(data)
+        @inbounds s[i] = 0.5 * data.Mass[i] * data.Vel[i] * data.Vel[i]
     end
     return sum(s)
 end

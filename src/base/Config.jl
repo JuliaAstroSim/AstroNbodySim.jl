@@ -157,6 +157,23 @@ function GravityConfig(units = uAstro;
     enlarge = EnlargeMesh,
     boundary = BoundaryCondition,
 )
+    # Validation: ForceSofteningTable must have exactly 6 entries (one per
+    # gadget2 particle type) and all values must be positive
+    if length(ForceSofteningTable) != 6
+        throw(ArgumentError(
+            "GravityConfig: ForceSofteningTable must have exactly 6 entries " *
+            "(one per particle Collection); got $(length(ForceSofteningTable))."
+        ))
+    end
+    if any(h -> !(h > zero(h)), ForceSofteningTable)
+        throw(ArgumentError(
+            "GravityConfig: all entries of ForceSofteningTable must be strictly " *
+            "positive; got $(collect(ForceSofteningTable))."
+        ))
+    end
+    if !(enlarge > zero(enlarge))
+        throw(ArgumentError("GravityConfig: `enlarge` must be positive; got $(enlarge)."))
+    end
     return GravityConfig(
         MVector{6}(ForceSofteningTable),
         model,
@@ -405,12 +422,12 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function TimeConfig(;
+function TimeConfig(; units = nothing,
     # Keywords from SimConfig
-    TimeBegin::Number = 0.0u"Gyr",
-    TimeEnd::Number = 0.1u"Gyr",
-    TimeBetweenSnapshots::Number = 0.01u"Gyr",
-    TimeStep::Number = 0.0u"Gyr",
+    TimeBegin::Number = isnothing(units) ? 0.0 : 0.0 * units[2],
+    TimeEnd::Number = isnothing(units) ? 0.1 : 0.1 * units[2],
+    TimeBetweenSnapshots::Number = isnothing(units) ? 0.01 : 0.01 * units[2],
+    TimeStep::Number = isnothing(units) ? 0.0 : 0.0 * units[2],
     TimeBase = 1<<30,
     ErrTolTimestep = 0.025,
     MinStep::Number = isnothing(units) ? 1.0e-8 : 1.0e-8 * units[2],
@@ -541,7 +558,7 @@ function SimConfig( ;
     acc = false,
     pot = false,
     SaveRestart = false,
-    SaveRestartFreq = 1.0,
+    SaveRestartFreq::Float64 = 1.0,
 
     # solver
     GravitySolver = DirectSum(),
@@ -576,6 +593,41 @@ function SimConfig( ;
     optimiser = Optimisers.Adam,
     solverdata = nothing,
 )
+    # ---- Input validation ----
+    # ForceSofteningTable: exactly 6 entries, all strictly positive
+    if length(ForceSofteningTable) != 6
+        throw(ArgumentError(
+            "SimConfig: ForceSofteningTable must have exactly 6 entries " *
+            "(one per particle Collection); got $(length(ForceSofteningTable))."
+        ))
+    end
+    if any(h -> !(h > zero(h)), ForceSofteningTable)
+        throw(ArgumentError(
+            "SimConfig: all entries of ForceSofteningTable must be strictly positive; " *
+            "got $(collect(ForceSofteningTable))."
+        ))
+    end
+    # TimeEnd must be strictly greater than TimeBegin to avoid non-positive
+    # TimeInterval / BetweenSnapshotsInt
+    if !(TimeEnd > TimeBegin)
+        throw(ArgumentError(
+            "SimConfig: TimeEnd ($(TimeEnd)) must be strictly greater than " *
+            "TimeBegin ($(TimeBegin))."
+        ))
+    end
+    if !(TimeBetweenSnapshots > zero(TimeBetweenSnapshots))
+        throw(ArgumentError(
+            "SimConfig: TimeBetweenSnapshots must be positive; got $(TimeBetweenSnapshots)."
+        ))
+    end
+    if SaveRestartFreq <= 0
+        throw(ArgumentError("SimConfig: SaveRestartFreq must be positive; got $(SaveRestartFreq)."))
+    end
+    if !(EnlargeMesh > 0)
+        throw(ArgumentError("SimConfig: EnlargeMesh must be positive; got $(EnlargeMesh)."))
+    end
+    # ---- End of validation ----
+
     # Construct here and initialize in Simulation
     if GravitySolver isa ML
         if !isnothing(cnn_model)
@@ -598,6 +650,7 @@ function SimConfig( ;
         units, ZeroValues, constants,
         loggingmode,
         TimeConfig(;
+            units,
             TimeBegin, TimeEnd, TimeBetweenSnapshots, TimeStep, TimeBase,
             ErrTolTimestep, MinStep, MaxStep, TimeIntegrationAlgorithm,
         ),
@@ -704,14 +757,23 @@ end
 $(TYPEDEF)
 
 $(TYPEDFIELDS)
+
+`StreamInfo` is a holder of `IO` streams used by the logger. The default
+constructor uses in-memory `IOBuffer`s so that no system file is opened
+until `setuploggers` runs. The fields are typed as `IO` (the abstract
+supertype of `IOStream`, `IOBuffer`, and any other I/O handle) which
+keeps the struct flexible and type-stable.
 """
 mutable struct StreamInfo
-    loggingio::IOStream
-    timerio::IOStream
-    analyserio::IOStream
+    "Stream for general logging"
+    loggingio::IO
+    "Stream for per-step timing CSV"
+    timerio::IO
+    "Stream for analyser CSV"
+    analyserio::IO
 end
 
-StreamInfo() = StreamInfo(IOStream(""), IOStream(""), IOStream(""))
+StreamInfo() = StreamInfo(IOBuffer(), IOBuffer(), IOBuffer())
 
 
 ##### TimeInfo #####
@@ -1028,6 +1090,13 @@ function Simulation(d;
     # Other keywords are passed to SimConfig
     kw...
 )
+    # Validate pids
+    if isempty(pids)
+        throw(ArgumentError("Simulation: `pids` must contain at least one worker id; got an empty array."))
+    end
+    if any(!isa(p, Integer) || p < 1 for p in pids)
+        throw(ArgumentError("Simulation: every entry of `pids` must be a positive integer; got $(pids)."))
+    end
     config = SimConfig(; floattype, units, device, EnlargeMesh, BoundaryCondition, kw...)
     check_compatibility(config)
     id = next_simulationid()

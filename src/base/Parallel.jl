@@ -34,21 +34,14 @@ minimum(sim::Simulation, expr1, expr2, mod::Module = AstroNbodySim) = minimum(ga
 maximum(sim::Simulation, expr, mod::Module = AstroNbodySim) = maximum(gather(sim, expr, mod))
 maximum(sim::Simulation, expr1, expr2, mod::Module = AstroNbodySim) = maximum(gather(sim, expr1, expr2, mod))
 
-function send_buffer(sim::Simulation)
-    # Reduce communication blocking
-    # Move myid to last
-    src = myid()
-    circpids = circshift(sim.pids, length(sim.pids) - findfirst(x->x==src, sim.pids))
-
-    BufferType = typeof(first(sim.buffer.sendbuffer).second)
-    for target in circpids[1:end-1]
-        sim.recvbuffer[target] = (Distributed.remotecall_eval(AstroNbodySim, target, :(registry[$(sim.id)].buffer.sendbuffer[$src])))::BufferType
-    end
-end
-
 function send_buffer(sim::Simulation, sendsymbol::Symbol, recvsymbol::Symbol)
     src = myid()
-    circpids = circshift(sim.pids, length(sim.pids) - findfirst(x->x==src, sim.pids))
+    # Defensive: ensure src is in sim.pids to avoid nothing from findfirst
+    idx = findfirst(x -> x == src, sim.pids)
+    if idx === nothing
+        error("send_buffer: myid()=$src is not in sim.pids=$(sim.pids)")
+    end
+    circpids = circshift(sim.pids, length(sim.pids) - idx)
 
     BufferType = typeof(first(getfield(sim.buffer, sendsymbol)).second)
     for target in circpids[1:end-1]

@@ -54,7 +54,7 @@ flag_load_LMC = true   # If true and the file exists, skip trajectory lookback o
 ##### Initialize MW model
 @info "Initializing MW's baryons"
 #TODO: WaveDM.jl
-baryon_particles = test_MW_MOND(;
+baryon_particles = simulate_waveDM(;
     V = (x,y,z,ψ)->0.0,
     Nx = 32,
     Np,

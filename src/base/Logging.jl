@@ -36,7 +36,7 @@ function restartloggers(sim::Simulation)
     end
 
     if sim.config.loggingmode == ProgressMode()
-        setup_progress(sim, sim.TimestepConfig)
+        setup_progress(sim, sim.config.time.step)
     end
 
     #TODO restart progress

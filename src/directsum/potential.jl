@@ -40,11 +40,9 @@ function compute_unit_potential_at_point(pos::AbstractPoint, data::StructArray, 
     return sum(pot)
 end
 function compute_unit_potential_at_point(particle::AbstractParticle, data::StructArray, G::Number, h::Number)
-    #pot = map(d -> compute_unit_potential_from_particle(particle.Pos, d, G, h), Iterators.flatten(values(data)))
-    #return sum(pot)
     pot = similar(data.Potential)
     for i in eachindex(data)
-        @inbounds pot = compute_unit_potential_from_particle(particle.Pos, data.Pos[i], data.Mass[i], G, h)
+        @inbounds pot[i] = compute_unit_potential_from_particle(particle.Pos, data.Pos[i], data.Mass[i], G, h)
     end
     return sum(pot)
 end
