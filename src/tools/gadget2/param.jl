@@ -200,13 +200,16 @@ function alter_line(filename::String, match::String, newline::String; all = fals
     words = readlines(filename)
     firstdone = false
     for line in words
-        if occursin(match, line)
-            if !firstdone || all
-                println(line)
-                write(newfile, newline)
-                firstdone = true
-            end
+        # Replace only when this is the first match (or all=true) and the
+        # current line actually contains the pattern. The `(!firstdone || all)`
+        # guard ensures later matches are preserved verbatim when all=false.
+        if occursin(match, line) && (all || !firstdone)
+            println(line)
+            write(newfile, newline)
+            firstdone = true
         else
+            # Preserve the original line (both for non-matching lines and for
+            # subsequent matches when `all=false`).
             write(newfile, line)
         end
         write(newfile, "\n")

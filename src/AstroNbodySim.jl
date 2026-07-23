@@ -105,6 +105,7 @@ export
 
     # Configs
     SimConfig,
+    GravityConfig,
     LogInfo,
     StreamInfo,
     TimeInfo,
@@ -135,7 +136,7 @@ export
     compute_force,
     softlen,
     suggest_softlen,
-    suggest_softlen!, set_softlen!,
+    suggest_softlen!, set_softlen!, set_softlen_local!,
 
     # PM
     smooth_coef,
@@ -176,6 +177,9 @@ export
     QUMOND_PDM_density,
     QUMOND_phi,
     QUMOND_acc, QUMOND_acc!,
+
+    # MOG (Modified Gravity) stubs
+    MOG_phi, MOG_acc, MOG_acc!,
 
     # Tools
     write_gadget2_makefile,
@@ -242,6 +246,7 @@ include("base/PostProcessing/Potential.jl")
 
 include("mond/milgrom1983.jl")
 include("mond/qumond.jl")
+include("mond/MOG.jl")
 
 include("tree/gravity.jl")
 include("tree/timestep.jl")

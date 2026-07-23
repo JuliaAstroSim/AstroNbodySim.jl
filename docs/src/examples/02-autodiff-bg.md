@@ -1,5 +1,11 @@
 # 02 Autodiff on background potential field
 
+In this example, we drive a Zygote-derived gradient through the
+`bgforce` hook of [`Simulation`](@ref). Provided Zygote.jl is loaded
+*before* `AstroNbodySim.jl`, every `bgforce::Function` is treated as
+potentially differentiable, which means the library will dispatch
+through `ChainRulesCore` to compute the adjoint of the dynamics.
+
 ```julia
 using PhysicalParticles, UnitfulAstro
 using AstroNbodySim

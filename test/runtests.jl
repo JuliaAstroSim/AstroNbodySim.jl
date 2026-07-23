@@ -29,6 +29,9 @@ pids = addprocs(4)
 @everywhere using PhysicalMeshes
 @everywhere using AstroNbodySim.PhysicalFDM
 @everywhere using AstroNbodySim.PhysicalFFT
+@everywhere using AstroIC
+
+@everywhere using FileIO
 
 @everywhere astro()
 

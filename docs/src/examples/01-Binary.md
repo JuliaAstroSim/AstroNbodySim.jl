@@ -8,6 +8,12 @@ In this example, we demonstrate how to:
 - Add a background force field
 - Integrate elliptic orbits
 
+> **Note** Background forces can be either a function of position only
+> (`bgforce = Function[f]`) or a function of `(particle, time)` (`bgforce =
+> Function[f]` with `f(p, t)`). The second form is needed when the field
+> evolves explicitly with the simulation clock (e.g. a rotating potential
+> or a time-dependent central mass).
+
 ## Circular binary
 
 ```julia

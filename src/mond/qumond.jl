@@ -14,12 +14,49 @@ function QUMOND_PDM_density(m::MeshCartesianStatic, ACC0::Number, G::Number)
     RHS.y .= nu2.(y) .* accNewton.y
     RHS.z .= nu2.(y) .* accNewton.z
 
-    #TODO MOND boundary conditions
     # Divergence of vector field
-    ρx = diff_central_x(config.Δ[1], RHS.x) 
-    ρy = diff_central_y(config.Δ[2], RHS.y) 
-    ρz = diff_central_z(config.Δ[3], RHS.z) 
+    # ρx = diff_central_x(config.Δ[1], RHS.x) 
+    # ρy = diff_central_y(config.Δ[2], RHS.y) 
+    # ρz = diff_central_z(config.Δ[3], RHS.z) 
+
+    # Divergence of the ``nu2*acc`` vector field. ``PhysicalFDM.diff_central_*``
+    # pads with zero at the boundary which, for a periodic mesh, is
+    # inconsistent with the actual wrap-around and contaminates the
+    # resulting ``rho_PDM`` whenever the RHS is not exactly zero at the
+    # boundary. We instead compute the divergence with ``circshift``
+    # which honors the periodic topology of ``m.config.boundary``.
+    ρx = _periodic_central_diff(RHS.x, config.Δ[1], 1, config.boundary)
+    ρy = _periodic_central_diff(RHS.y, config.Δ[2], 2, config.boundary)
+    ρz = _periodic_central_diff(RHS.z, config.Δ[3], 3, config.boundary)
     return ρPDM = (ρx + ρy + ρz) ./ (4π*G)
+end
+
+"""
+    _periodic_central_diff(u, Δ, axis, boundary)
+
+Central finite difference of ``u`` along ``axis`` with spacing ``Δ``.
+When ``boundary isa Periodic`` the wrap-around is honored via
+``circshift`` (so a constant ``u`` has zero divergence everywhere);
+otherwise fall back to ``diff_central_*`` which pads with zero.
+"""
+function _periodic_central_diff(u::AbstractArray, Δ, axis::Int, boundary::Periodic)
+    shift_fwd = ntuple(i -> i == axis ? -1 : 0, ndims(u))
+    shift_bwd = ntuple(i -> i == axis ? +1 : 0, ndims(u))
+    return (circshift(u, shift_fwd) .- circshift(u, shift_bwd)) ./ (2 * Δ)
+end
+
+function _periodic_central_diff(u::AbstractArray, Δ, axis::Int, boundary)
+    # Non-periodic: fall back to the standard ``diff_central_*`` from
+    # PhysicalFDM which pads the boundary with zero.
+    if axis == 1
+        return diff_central_x(Δ, u)
+    elseif axis == 2
+        return diff_central_y(Δ, u)
+    elseif axis == 3
+        return diff_central_z(Δ, u)
+    else
+        error("Unsupported FDM dimension: $(axis)")
+    end
 end
 
 function mesh_set_boundary_potential_QUMOND(index, m, A, b, TA, sq, ms)
@@ -38,7 +75,12 @@ Warning: Currently the Poisson equation is solved with periodic boundary conditi
 """
 function QUMOND_phi(m::MeshCartesianStatic, ACC0::Number, G::Number)
     rho_PDM = QUMOND_PDM_density(m, ACC0, G)
-    rho = rho_PDM + m.rho
+    # ``m.rho`` is an ``ArrayScalarField``; convert to its underlying
+    # data array so the broadcast ``rho_PDM + m.rho`` is plain
+    # ``Array + Array``. This also avoids any ``RHOFIELD`` overload
+    # ambiguity when ``m.rho`` shares its type parameter with
+    # ``m.rho_e`` (PhysicalMeshes binds the two to one ``RHOFIELD``).
+    rho = rho_PDM .+ m.rho.data
     fft_poisson(m.config.Δ, m.config.Len, ustrip.(rho*4π*G), Periodic(), m.config.device) .* unit(eltype(m.phi))
 end
 
@@ -55,9 +97,9 @@ function QUMOND_acc(m::MeshCartesianStatic, ACC0::Number, G::Number)
     config = m.config
     phi_PDM = QUMOND_phi(m, ACC0, G)
     acc = similar(m.acc)
-    acc.x .= -diff_central_x(config.Δ[1], phi_PDM)
-    acc.y .= -diff_central_y(config.Δ[2], phi_PDM)
-    acc.z .= -diff_central_z(config.Δ[3], phi_PDM)
+    acc.x .= .- _periodic_central_diff(phi_PDM, config.Δ[1], 1, config.boundary)
+    acc.y .= .- _periodic_central_diff(phi_PDM, config.Δ[2], 2, config.boundary)
+    acc.z .= .- _periodic_central_diff(phi_PDM, config.Δ[3], 3, config.boundary)
     return acc
 end
 
@@ -69,8 +111,8 @@ Apply QUMOND (QUasi-linear MOdified Newtonian Dynamics) formula to accelerations
 function QUMOND_acc!(m::MeshCartesianStatic, ACC0::Number, G::Number)
     config = m.config
     phi_PDM = QUMOND_phi(m, ACC0, G)
-    m.acc.x .-= diff_central_x(config.Δ[1], phi_PDM)
-    m.acc.y .-= diff_central_y(config.Δ[2], phi_PDM)
-    m.acc.z .-= diff_central_z(config.Δ[3], phi_PDM)
+    m.acc.x .-= _periodic_central_diff(phi_PDM, config.Δ[1], 1, config.boundary)
+    m.acc.y .-= _periodic_central_diff(phi_PDM, config.Δ[2], 2, config.boundary)
+    m.acc.z .-= _periodic_central_diff(phi_PDM, config.Δ[3], 3, config.boundary)
     return nothing
 end

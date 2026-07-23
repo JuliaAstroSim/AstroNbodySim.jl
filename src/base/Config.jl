@@ -734,8 +734,17 @@ function LogInfo(;
         timers = DefaultTimer,
         analysers = Dict{String, Function}(),
     )
-    timing = [UInt64(0) for i in eachindex(timers)]
-    return LogInfo(timers, timing, analysers)
+    # Build a fresh Dict explicitly so that any subsequent in-place mutation
+    # via the custom setproperty! (empty! + merge!) can never accidentally
+    # mutate the global `DefaultTimer`. Using explicit construction instead
+    # of `copy()` guarantees independence even if `copy` ever returns the
+    # same object (e.g. due to a misbehaving overload).
+    timers_copy = Dict{String, Int}()
+    for (k, v) in timers
+        timers_copy[k] = v
+    end
+    timing = [UInt64(0) for _ in 1:length(timers_copy)]
+    return LogInfo(timers_copy, timing, analysers)
 end
 
 """
@@ -745,6 +754,14 @@ Modify the memories of Dict rather than modifing the pointer of Dict
 """
 function Base.setproperty!(x::LogInfo, symbol::Symbol, d::Dict)
     a = getproperty(x, symbol)
+    # Defensive: never silently corrupt the global `DefaultTimer` if a
+    # LogInfo was somehow constructed with an aliased reference. Without
+    # this check, an `empty!` below would wipe out the module-level
+    # DefaultTimer and break every subsequently-constructed LogInfo.
+    if a === DefaultTimer
+        error("LogInfo.$symbol is aliased to the global DefaultTimer; " *
+              "refusing to mutate. This indicates a bug in LogInfo().")
+    end
     if !(a===d)
         empty!(a)
         merge!(a, d)

@@ -1,10 +1,12 @@
 function get_timestep(acc::AbstractPoint, SofteningLength::Number, TimestepConfig::AdaptiveTimestep)
     ac = norm(acc)
     # Guard against zero/NaN acceleration or zero softening
-    if !isfinite(ac) || ac == 0
+    # Note: use iszero/zero(...) to be dimension-safe in Julia 1.12+ Unitful;
+    # `ac == 0` and `SofteningLength <= 0` raise DimensionError when the operand has units.
+    if !isfinite(ac) || iszero(ac)
         throw(ArgumentError("get_timestep: non-finite or zero acceleration $(ac); cannot derive dt"))
     end
-    if SofteningLength <= 0
+    if SofteningLength <= zero(SofteningLength)
         throw(ArgumentError("get_timestep: non-positive softening length $(SofteningLength)"))
     end
     dt = sqrt(2 * TimestepConfig.ErrTolTimestep * SofteningLength / ac)

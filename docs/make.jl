@@ -2,8 +2,8 @@
 Compile with:
 julia --project=docs/ --color=yes docs/make.jl
 
-Generate key:
-DocumenterTools.genkeys(user="JuliaAstroSim", repo="git@github.com:JuliaAstroSim/AstroNbodySim.jl.git")
+Deployment is handled out-of-band by the `julia-actions/julia-docdeploy`
+GitHub Action (see `.github/workflows/ManuallyBuildDoc.yml`).
 """
 
 using Documenter
@@ -24,7 +24,7 @@ makedocs(
     format = Documenter.HTML(
         # Use clean URLs, unless built as a "local" build
         prettyurls = !("local" in ARGS),
-        canonical = "https://juliaastrosims.github.io/AstroNbodySim.jl/dev/",
+        canonical = "https://juliaastrosim.github.io/AstroNbodySim.jl/dev/",
         assets = ["assets/alpha_small.ico"],
         analytics = "UA-153693590-1",
         highlights = ["llvm", "yaml"],

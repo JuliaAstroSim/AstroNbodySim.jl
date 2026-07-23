@@ -50,5 +50,7 @@ Eccentricity vector of elliptic orbit
 - `v`: velocity vector at position `r`
 """
 function eccentricity(G::Number, M::Number, r::AbstractPoint, v::AbstractPoint)
-    return normalize(r) - cross(v, cross(r, v)) / (G * M)
+    # Use r/norm(r) instead of normalize(r) to preserve units, so the result
+    # is dimensionally compatible with `cross(v, cross(r, v)) / (G * M)`.
+    return r / norm(r) - cross(v, cross(r, v)) / (G * M)
 end

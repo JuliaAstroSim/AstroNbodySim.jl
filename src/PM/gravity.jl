@@ -8,11 +8,21 @@ function compute_acc(m::MeshCartesianStatic, dim::Val{3}, mode::VertexMode)
     config = m.config
 
     # acc on the boundaries are omitted. This does no harm because we have enlarged the mesh extent.
-    m.acc.x .= -diff_central_x(config.Δ[1], m.phi)
-    m.acc.y .= -diff_central_y(config.Δ[2], m.phi)
-    m.acc.z .= -diff_central_z(config.Δ[3], m.phi)
+    # ``m.phi`` is stored as an ``ArrayScalarField`` wrapper which
+    # ``diff_central_*`` does not accept directly — extract the underlying
+    # data array first.
+    phi = _unwrap_field(m.phi)
+    m.acc.x .= -diff_central_x(config.Δ[1], phi)
+    m.acc.y .= -diff_central_y(config.Δ[2], phi)
+    m.acc.z .= -diff_central_z(config.Δ[3], phi)
     return nothing
 end
+
+# Unwrap a field to its underlying array. ``ArrayScalarField`` and similar
+# PhysicalMeshes wrappers expose the storage through ``.data``; plain
+# arrays are returned as-is.
+_unwrap_field(u::AbstractArray) = u
+_unwrap_field(u) = hasproperty(u, :data) ? getproperty(u, :data) : u
 
 function compute_acc(m::MeshCartesianStatic)
     compute_acc(m, Val(m.config.dim), m.config.mode)

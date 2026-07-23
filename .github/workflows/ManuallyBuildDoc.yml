@@ -1,26 +1,92 @@
 name: ManuallyBuildDoc
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  [workflow_dispatch]
 
-# 64-bit Julia only
+# `julia-actions/julia-docdeploy@v1` invokes `julia docs/make.jl` itself, which
+# in turn calls both `makedocs` and `deploydocs`. With `GITHUB_TOKEN` available
+# (via the `contents: write` permission) Documenter.jl detects the GitHub
+# Actions environment and pushes the rendered docs to the `gh-pages` branch
+# using the auto-injected token — no `DOCUMENTER_KEY` SSH secret required.
+#
+# Why this is shaped the way it is (X server instead of xvfb-run prefix):
+#
+# 1. `docs/src/tutorial/basic.md` contains `@example basic` blocks that call
+#    `plot_makie(...)`, which loads `GLMakie` and tries to open an X11 display
+#    to create the GL context.
+# 2. `julia-actions/julia-docdeploy@v1` embeds its `prefix` input as a
+#    single bash word in an array, so `xvfb-run -a -s "-screen 0 1024x768x24"`
+#    cannot be passed through `prefix:` cleanly (the inner quotes are
+#    preserved as literals and break Xvfb's arg parsing — see
+#    `.experiences/INDEX.md` for the full root-cause analysis).
+# 3. The supported use case for `prefix:` is wrapping the action's `julia`
+#    command in a single binary word, e.g. `prefix: time`. Anything more
+#    complex must be moved into a hand-written step.
+#
+# Workaround: start a persistent Xvfb on display `:99` as a background
+# daemon, set `DISPLAY=:99` for every Julia invocation, and skip the
+# action's `install-package` step so we control install ourselves.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, '[doc]')"
     steps:
-      - uses: actions/checkout@v1
-      - uses: julia-actions/setup-julia@latest
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
-          version: '1.11.6'
-      - run: sudo apt-get update && sudo apt-get install -y xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
-      - run: julia --project=docs -e '
-          using Pkg;
-          Pkg.add("Documenter");
-          Pkg.develop(PackageSpec(; path=pwd()));
-          Pkg.instantiate();'
-      - name: Build and deploy doc
-        env:
-          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Deploying to else where, so use SSH instead
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          version: '1.12'
+
+      - name: Install GLMakie system dependencies
         run: >
-          DISPLAY=:0 xvfb-run -s '-screen 0 1024x768x24' julia --project=docs --color=yes docs/make.jl
+          sudo apt-get update &&
+          sudo apt-get install -y
+          xorg-dev mesa-utils xvfb libgl1 freeglut3-dev
+          libxrandr-dev libxinerama-dev libxcursor-dev
+          libxi-dev libxext-dev
+
+      # Persistent X server on display :99. Pkg.instantiate() can take
+      # 5-10 minutes for AstroNbodySim (40+ deps); without a stable display
+      # GLMakie would fail to precompile.
+      - name: Start virtual X server
+        run: |
+          set -e
+          sudo Xvfb :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset &
+          Xvfb_PID=$!
+          sleep 2
+          if ! kill -0 "$Xvfb_PID" 2>/dev/null; then
+            echo "Xvfb failed to start" >&2
+            exit 1
+          fi
+          echo "Xvfb_PID=$Xvfb_PID" >> "$GITHUB_ENV"
+
+      - name: Install package into docs environment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISPLAY: ":99"
+        run: >
+          julia --color=yes --project=docs/ -e '
+            using Pkg;
+            Pkg.develop(PackageSpec(path=pwd()));
+            Pkg.instantiate()'
+
+      # Build + deploy. `install-package: false` skips the action's
+      # install step (we did it above under Xvfb). The same `:99`
+      # display is forwarded so the @example block can render `fig`.
+      - name: Build and deploy documentation
+        uses: julia-actions/julia-docdeploy@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_VERSION: 0.27.25
+          DISPLAY: ":99"
+        with:
+          install-package: false
+
+      - name: Stop virtual X server
+        if: always()
+        run: |
+          if [ -n "${Xvfb_PID:-}" ]; then
+            sudo kill "$Xvfb_PID" 2>/dev/null || true
+            sudo kill -9 "$Xvfb_PID" 2>/dev/null || true
+          fi
