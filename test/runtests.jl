@@ -29,9 +29,9 @@ pids = addprocs(4)
 @everywhere using PhysicalMeshes
 @everywhere using AstroNbodySim.PhysicalFDM
 @everywhere using AstroNbodySim.PhysicalFFT
-@everywhere using AstroIC
 
 @everywhere using FileIO
+@everywhere using AstroIC
 
 @everywhere astro()
 
@@ -48,6 +48,10 @@ using CUDA
 IsLocal = false
 
 include("StaticTest.jl")
+include("StaticTools.jl")
+include("StaticDataProcessing.jl")
+include("StaticMOND.jl")
+include("StaticSimulationLifecycle.jl")
 include("PM.jl")
 
 if IsLocal

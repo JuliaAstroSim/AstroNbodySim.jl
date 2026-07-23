@@ -3,16 +3,16 @@ Compile with:
 julia --project=docs/ --color=yes docs/make.jl
 
 Deployment is handled out-of-band by the `julia-actions/julia-docdeploy`
-GitHub Action (see `.github/workflows/ManuallyBuildDoc.yml`).
+GitHub Action (see `.github/workflows/Documentation.yml`).
 """
 
 using Documenter
 
 using AstroNbodySim
 
-# The DOCSARGS environment variable can be used to pass additional arguments to make.jl.
-# This is useful on CI, if you need to change the behavior of the build slightly but you
-# can not change the .travis.yml or make.jl scripts any more (e.g. for a tag build).
+# The DOCSARGS environment variable can be used to pass additional
+# arguments to make.jl.  Useful for CI when tweaking behaviour without
+# editing the script itself.
 if haskey(ENV, "DOCSARGS")
     for arg in split(ENV["DOCSARGS"])
         (arg in ARGS) || push!(ARGS, arg)
@@ -22,13 +22,15 @@ end
 makedocs(
     modules = [AstroNbodySim],
     format = Documenter.HTML(
-        # Use clean URLs, unless built as a "local" build
         prettyurls = !("local" in ARGS),
         canonical = "https://juliaastrosim.github.io/AstroNbodySim.jl/dev/",
         assets = ["assets/alpha_small.ico"],
         analytics = "UA-153693590-1",
         highlights = ["llvm", "yaml"],
     ),
+    # When true, Documenter will skip broken cross-references and
+    # missing `@docs`/doctest errors instead of bailing out.
+    warnonly = ("warnonly=true" in ARGS) || get(ENV, "DOCSARGS_WARN", "") == "1",
     clean = false,
     sitename = "AstroNbodySim.jl",
     authors = "islent",
@@ -37,9 +39,15 @@ makedocs(
         "Home" => "index.md",
         "Tutorials" => Any[
             "tutorial/basic.md",
+            "tutorial/mond.md",
+            "tutorial/psn.md",
         ],
         "Manual" => Any[
             "manual/DirectSum.md",
+            "manual/Tree.md",
+            "manual/FFT.md",
+            "manual/FDM.md",
+            "manual/ML.md",
         ],
         "Examples" => Any[
             "examples/01-Binary.md",
@@ -64,9 +72,6 @@ makedocs(
             "ChineseManual/DirectSum.md",
         ],
     ],
-    #workdir = joinpath(@__DIR__, "../test"),
-    #strict = !("strict=false" in ARGS),
-    #doctest = ("doctest=only" in ARGS) ? :only : true,
 )
 
 deploydocs(

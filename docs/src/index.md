@@ -7,7 +7,9 @@ A年astrophysical simulation code library under GPL 3.0
 ```julia
 ]add AstroNbodySim
 ```
-or
+
+or, to install from the latest `main` branch:
+
 ```julia
 ]add https://github.com/JuliaAstroSim/AstroNbodySim.jl
 ```
@@ -83,6 +85,16 @@ This software was developed as part of academic research. If you would like to h
 
 ```@contents
 Pages = [
+    "tutorial/basic.md",
+    "tutorial/mond.md",
+    "tutorial/psn.md",
+    "manual/DirectSum.md",
+    "manual/Tree.md",
+    "manual/FFT.md",
+    "manual/FDM.md",
+    "manual/ML.md",
+    "lib/Types.md",
+    "lib/Methods.md",
 ]
 Depth = 1
 ```
