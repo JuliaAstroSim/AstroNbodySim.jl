@@ -45,7 +45,7 @@ the expression reduces to the usual Newtonian acceleration
 
 The implementation is in
 [`src/directsum/gravity.jl`](https://github.com/JuliaAstroSim/AstroNbodySim.jl/blob/main/src/directsum/gravity.jl).
-Note that the helper [`compute_force_pairwise`](@ref) uses a *Plummer*
+Note that the helper `compute_force_pairwise` uses a *Plummer*
 softening ``(\lVert\Delta\mathbf{r}\rVert^2 + h^2)^{-3/2}``; it is not the
 kernel used by the main solver loop above. Some references describe the force
 softening generically as Plummer softening, while the production kernel in
@@ -135,14 +135,3 @@ for quantitative cross-solver comparisons.
 
 - Springel, V., Yoshida, N. & White, S. D. M. 2001, New Astronomy, 6, 79.
 - Springel, V. 2005, Nature, 435, 629.
-
-## API
-
-```@docs
-compute_force
-compute_force_pairwise
-softlen
-suggest_softlen
-suggest_softlen!
-set_softlen!
-```

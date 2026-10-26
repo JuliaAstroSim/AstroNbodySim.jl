@@ -38,7 +38,7 @@ g(u) =
 该核函数在 ``u=1/2`` 与 ``u=1`` 处为 ``\mathcal{C}^2``；当 ``u \ge 1`` 时退化为
 通常的 Newton 引力 ``G m_j (\mathbf{r}_j-\mathbf{r}_i)/r^3``。
 
-> 注意：[`compute_force_pairwise`](@ref) 使用的是 Plummer 软化
+> 注意：`compute_force_pairwise` 使用的是 Plummer 软化
 > ``(\lVert\Delta\mathbf{r}\rVert^2+h^2)^{-3/2}``，与主循环中的三次样条核不同。
 > 论文正文将力软化统称为 Plummer 软化，但 `compute_force_from_particle` 中实际
 > 使用的是上面的 Gadget-2 三次样条核。

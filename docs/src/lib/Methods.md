@@ -8,43 +8,30 @@ Pages = ["Methods.md"]
 
 ```@docs
 run
-step
-preprocessdata
-mainloop
+AstroNbodySim.mainloop
 ```
 
 ## Force / potential
 
 ```@docs
 compute_force
-compute_force_pairwise
+AstroNbodySim.compute_force_pairwise
 compute_acc
-compute_potential
-compute_kinetic
 softlen
 suggest_softlen
 suggest_softlen!
 set_softlen!
 set_softlen_local!
+AstroNbodySim.compute_kinetic
 ```
 
 ## Restart / output
 
-```@docs
-output
-restart
-saverestart
-loadrestart
-check_restartable
-redistribute_data
-```
+`saverestart`, `loadrestart`, `restart`, `check_restartable` and `redistribute_data`
+are part of the restart machinery driven by `run` / `Simulation`; they are
+internal helpers without user-facing docstrings in this release.
 
 ## Particle-Mesh
-
-```@docs
-diff_mat
-laplace_conv_op
-```
 
 The Poisson solvers are provided by `PhysicalFFT.jl` and `PhysicalFDM.jl`
 (no separate docstrings are attached in this package):
@@ -76,7 +63,7 @@ total_angular_momentum
 total_potential
 total_momentum
 total_kinetic
-total_kinetic_local
+AstroNbodySim.total_kinetic_local
 total_energy
 ellipticSemiMajor
 ellipticPeriod
@@ -100,9 +87,6 @@ orbitaltime
 ## Data processing
 
 ```@docs
-find_particle
-substract_by_id
-diff_by_id
 get_all_data
 get_local_data
 ```
@@ -118,7 +102,6 @@ QUMOND_PDM_density
 QUMOND_phi
 QUMOND_acc
 QUMOND_acc!
-QUMOND
 MOG_phi
 MOG_acc
 MOG_acc!
@@ -134,21 +117,15 @@ pseudoNewtonianAcc
 
 ## Output & logging
 
-```@docs
-outputparallel
-setuploggers
-LogInfo
-DefaultTimer
-mkpathIfNotExist
-traitstring
-```
+`outputparallel`, `setuploggers`, `DefaultTimer`, `mkpathIfNotExist` and
+`traitstring` are internal plumbing around the output/logging pipeline and are
+not part of the stable public API in this release (`LogInfo` is documented on
+the Types page).
 
 ## Utilities
 
 ```@docs
-write_gadget2_makefile
 write_gadget2_param
 alter_param
 alter_line
-add_line
 ```

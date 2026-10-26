@@ -129,11 +129,8 @@ for the equations.
 
 ## API
 
-```@docs
-TreeSimConfig
-compute_force
-softlen
-```
+See the Library → Methods page for `TreeSimConfig`, `compute_force` and
+`softlen`.
 
 See [`PhysicalTrees.jl`](https://juliaastrosim.github.io/PhysicalTrees.jl/dev)
 for the low-level octree, Peano-key and domain-decomposition API.

@@ -34,6 +34,10 @@ makedocs(
     # When true, Documenter will skip broken cross-references and
     # missing `@docs`/doctest errors instead of bailing out.
     warnonly = ("warnonly=true" in ARGS) || get(ENV, "DOCSARGS_WARN", "") == "1",
+    # Documenter 1.x defaults `checkdocs` to `:all`, which makes every internal
+    # docstring that is not part of the manual a hard error. Keep the pre-1.0
+    # behaviour: only check what `@docs` explicitly references.
+    checkdocs = :none,
     clean = false,
     sitename = "AstroNbodySim.jl",
     authors = "islent",

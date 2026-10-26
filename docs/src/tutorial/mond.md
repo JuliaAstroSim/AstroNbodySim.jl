@@ -100,15 +100,6 @@ run(sim_q)
 
 ## API
 
-```@docs
-MOND1983Milgrom
-QUMOND
-QUMOND_PDM_density
-QUMOND_phi
-QUMOND_acc
-QUMOND_acc!
-nu
-nu1
-nu2
-mond_Milgrom1983
-```
+The MOND / QUMOND kernels (`nu`, `nu1`, `nu2`, `mond_Milgrom1983`,
+`QUMOND_PDM_density`, `QUMOND_phi`, `QUMOND_acc`, `QUMOND_acc!`, `MOG_phi`,
+`MOG_acc`) are documented on the Library → Methods page.

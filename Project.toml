@@ -1,6 +1,6 @@
 name = "AstroNbodySim"
 uuid = "034523a5-eae8-49f5-9052-0ea364535333"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["islent <leoislent@gmail.com>"]
 
 [deps]

@@ -66,8 +66,5 @@ required signature is `f(particle, time) -> acceleration`.
 
 ## API
 
-```@docs
-r_g
-pseudoNewtonianPotential
-pseudoNewtonianAcc
-```
+`r_g`, `pseudoNewtonianPotential` and `pseudoNewtonianAcc` are documented on
+the Library → Methods page.
