@@ -1,4 +1,11 @@
-# Compute force from sim
+"""
+    compute_force(sim::Simulation)
+    compute_force(sim::Simulation, pos, SoftLength)
+
+Compute gravitational accelerations using the solver and device stored in `sim.config`.
+The in-place form updates `data.Acc`;
+the position-based form returns the accelerations evaluated at `pos` with the given softening length.
+"""
 function compute_force(sim::Simulation, pos::Union{Array{T,1}, T}, SoftLength::Number) where T<:AbstractPoint3D
     compute_force(sim, pos, SoftLength, sim.config.solver.grav, sim.config.device.type)
 end

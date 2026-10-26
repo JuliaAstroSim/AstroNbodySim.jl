@@ -1,3 +1,11 @@
+"""
+    cnn_poisson(m, u, dataML)
+
+Evaluate the neural network stored in `dataML.tstate` on the unit-scaled
+density field of mesh `m` and write the result to `m.phi`.
+
+This is an experimental inference hook; no stable training API is exposed.
+"""
 function cnn_poisson(m, u, dataML)
     unit_rho = m.rho / u.M * u.L^3
     result = Lux.apply(

@@ -77,10 +77,52 @@ or
 
 ## 支持与引用
 
-本项目用于学术研究。欢迎 Star 来支持我们。如果你在研究、教学和其他活动中用到了我们的代码，请引用如下文章：
-```tex
-%TODO WIP
+本项目用于学术研究。欢迎 Star 来支持我们。如果你在研究、教学和其他活动中用到了我们的代码，请引用本仓库以及所使用的版本/commit，并引用下列论文。
+
+`AstroNbodySim.jl` 是 [WaveDM.jl](https://github.com/JuliaAstroSim/WaveDM.jl) 的 N 体引擎：
+
+- **Meng, R. & Dong, X. 2026**, *WaveDM.jl: An Adaptable Simulation Framework for Dynamics of Baryonic and Wave Dark Matter on Galaxy Scales*, Research in Astronomy and Astrophysics — [期刊页面](http://iopscience.iop.org/article/10.1088/1674-4527/ae9042) · [arXiv:2606.25026](https://arxiv.org/abs/2606.25026) · DOI [10.1088/1674-4527/ae9042](https://doi.org/10.1088/1674-4527/ae9042)
+
+```bibtex
+@article{meng2026wavedmjladaptablea,
+  title = {{{WaveDM}}.Jl: {{An Adaptable Simulation Framework}} for {{Dynamics}} of {{Baryonic}} and {{Wave Dark Matter}} on {{Galaxy Scales}}},
+  shorttitle = {{{WaveDM}}.Jl},
+  author = {Meng, Runyu and Dong, Xiaobo},
+  year = 2026,
+  journal = {Research in Astronomy and Astrophysics},
+  issn = {1674-4527},
+  doi = {10.1088/1674-4527/ae9042},
+  url = {http://iopscience.iop.org/article/10.1088/1674-4527/ae9042},
+  eprint = {2606.25026},
+  archiveprefix = {arXiv},
+  primaryclass = {astro-ph.GA},
+  urldate = {2026-07-26}
+}
 ```
+
+基于本代码库完成的后续工作：
+
+- **Meng, R. & Dong, X. 2026**, *Wave Cold Dark Matter Can Reproduce the Radial Acceleration Relation in X-ray Elliptical Galaxies*, Research in Astronomy and Astrophysics — [期刊页面](http://iopscience.iop.org/article/10.1088/1674-4527/aeac08) · [arXiv:2610.18969](https://arxiv.org/abs/2610.18969) · DOI [10.1088/1674-4527/aeac08](https://doi.org/10.1088/1674-4527/aeac08)
+
+```bibtex
+@article{meng2026wavecold,
+  title = {Wave {{Cold Dark Matter Can Reproduce}} the {{Radial Acceleration Relation}} in {{X}}-Ray {{Elliptical Galaxies}}},
+  author = {Meng, Runyu and Dong, Xiaobo},
+  year = 2026,
+  journal = {Research in Astronomy and Astrophysics},
+  issn = {1674-4527},
+  doi = {10.1088/1674-4527/aeac08},
+  url = {http://iopscience.iop.org/article/10.1088/1674-4527/aeac08},
+  eprint = {2610.18969},
+  archiveprefix = {arXiv},
+  primaryclass = {astro-ph.GA},
+  urldate = {2026-09-24}
+}
+```
+
+各引力求解器的方法学参考文献见
+[CITING 页面](https://juliaastrosim.github.io/AstroNbodySim.jl/dev/citation/)，
+BibTeX 条目亦见 [`CITATION.bib`](CITATION.bib)。
 
 ## 代码架构
 

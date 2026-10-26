@@ -76,6 +76,13 @@ function set_softlen_local!(sim::Simulation, h::Number)
     return nothing
 end
 
+"""
+    set_softlen!(sim::Simulation, h)
+    set_softlen!(sim::Simulation, h, solver, device)
+
+Set all entries of `sim.config.grav.ForceSofteningTable` to `h`. For
+distributed particle solvers the new value is broadcast to every worker.
+"""
 function set_softlen!(sim::Simulation, h, ::Union{DirectSum, Tree}, ::CPU)
     bcast(sim, set_softlen_local!; args = (h,))
 end

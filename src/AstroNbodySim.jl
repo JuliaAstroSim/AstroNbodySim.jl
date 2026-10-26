@@ -32,7 +32,6 @@ using BangBang
 
 # mesh
 using FFTW
-using Tullio
 using PaddedViews
 using OffsetArrays
 using IterativeSolvers

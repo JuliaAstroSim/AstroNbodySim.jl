@@ -1,51 +1,66 @@
 # Methods
 
-## Index
 ```@index
 Pages = ["Methods.md"]
 ```
 
-## Public
+## Main functions
 
-### Main functions
 ```@docs
 run
 step
 preprocessdata
+mainloop
+```
+
+## Force / potential
+
+```@docs
 compute_force
+compute_force_pairwise
+compute_acc
 compute_potential
-output
-restart
-saverestart
-loadrestart
+compute_kinetic
 softlen
 suggest_softlen
 suggest_softlen!
 set_softlen!
+set_softlen_local!
 ```
 
-### Particle-Mesh
+## Restart / output
+
 ```@docs
-smooth_coef
+output
+restart
+saverestart
+loadrestart
+check_restartable
+redistribute_data
+```
+
+## Particle-Mesh
+
+```@docs
 diff_mat
-diff_vec
-delta_mat2
-delta_mat3
 laplace_conv_op
-laplace_conv
-fft_poisson
-fft_poisson!
-fdm_poisson
 ```
 
-### Machine Learning
-```@docs
-train_cnn_poisson2d
-train_cnn_poisson3d
-cnn_poisson
-```
+The Poisson solvers are provided by `PhysicalFFT.jl` and `PhysicalFDM.jl`
+(no separate docstrings are attached in this package):
 
-### Timestep
+- `fft_poisson(Δ, Len, rho, boundary, device)` and
+  `fft_poisson(mesh, G)`.
+- `fft_poisson!(mesh, rho, boundary)`.
+- `fdm_poisson(mesh, Val(dim), G, mode, device, boundary, sparse)`.
+
+## Machine-Learning solver
+
+The `ML` solver is experimental; see the [ML manual page](@ref "ML Poisson solver (experimental)").
+No stable training API is exposed in this release.
+
+## Timestep
+
 ```@docs
 ConstantTimestep
 AdaptiveTimestep
@@ -54,51 +69,22 @@ find_next_sync_point_and_drift
 advance_and_find_timestep
 ```
 
-### Energy
+## Energy & orbits
+
 ```@docs
 total_angular_momentum
 total_potential
 total_momentum
 total_kinetic
+total_kinetic_local
 total_energy
-```
-
-### Data processing
-```@docs
-find_particle
-substract_by_id
-diff_by_id
-```
-
-### MOND
-```@docs
-nu
-nu1
-nu2
-mond_Milgrom1983
-QUMOND_PDM_density
-QUMOND_phi
-QUMOND_acc
-QUMOND
-```
-
-### Black Hole
-```@docs
-r_g
-radius_gravity
-radius_schwarzschild
-pseudoNewtonianPotential
-pseudoNewtonianAcc
-```
-
-### Elliptic Orbit
-```@docs
 ellipticSemiMajor
 ellipticPeriod
 eccentricity
 ```
 
-### Time scales
+## Time scales
+
 ```@docs
 typicalvelocity
 meandensity
@@ -111,7 +97,43 @@ freefalltime
 orbitaltime
 ```
 
-### Output and Logging
+## Data processing
+
+```@docs
+find_particle
+substract_by_id
+diff_by_id
+get_all_data
+get_local_data
+```
+
+## MOND / QUMOND / MOG
+
+```@docs
+nu
+nu1
+nu2
+mond_Milgrom1983
+QUMOND_PDM_density
+QUMOND_phi
+QUMOND_acc
+QUMOND_acc!
+QUMOND
+MOG_phi
+MOG_acc
+MOG_acc!
+```
+
+## Pseudo-Newtonian (black-hole) potentials
+
+```@docs
+r_g
+pseudoNewtonianPotential
+pseudoNewtonianAcc
+```
+
+## Output & logging
+
 ```@docs
 outputparallel
 setuploggers
@@ -121,16 +143,12 @@ mkpathIfNotExist
 traitstring
 ```
 
-### Tools
+## Utilities
+
 ```@docs
 write_gadget2_makefile
 write_gadget2_param
 alter_param
 alter_line
 add_line
-```
-
-## Internal
-```@docs
-
 ```

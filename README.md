@@ -80,11 +80,55 @@ Accretion history:
 
 ## Supporting and Citing
 
-This software was developed as part of academic research. If you would like to help support it, please star the repository. If you use this software as part of your research, teaching, or other activities, we would be grateful if you could cite the following:
+This software was developed as part of academic research. If you use it in
+research, teaching, or other activities, please cite the package repository
+together with the version/commit you used, and cite the following papers.
 
-```tex
-%TODO WIP
+`AstroNbodySim.jl` is the N-body engine of
+[WaveDM.jl](https://github.com/JuliaAstroSim/WaveDM.jl):
+
+- **Meng, R. & Dong, X. 2026**, *WaveDM.jl: An Adaptable Simulation Framework for Dynamics of Baryonic and Wave Dark Matter on Galaxy Scales*, Research in Astronomy and Astrophysics — [journal article](http://iopscience.iop.org/article/10.1088/1674-4527/ae9042) · [arXiv:2606.25026](https://arxiv.org/abs/2606.25026) · DOI [10.1088/1674-4527/ae9042](https://doi.org/10.1088/1674-4527/ae9042)
+
+```bibtex
+@article{meng2026wavedmjladaptablea,
+  title = {{{WaveDM}}.Jl: {{An Adaptable Simulation Framework}} for {{Dynamics}} of {{Baryonic}} and {{Wave Dark Matter}} on {{Galaxy Scales}}},
+  shorttitle = {{{WaveDM}}.Jl},
+  author = {Meng, Runyu and Dong, Xiaobo},
+  year = 2026,
+  journal = {Research in Astronomy and Astrophysics},
+  issn = {1674-4527},
+  doi = {10.1088/1674-4527/ae9042},
+  url = {http://iopscience.iop.org/article/10.1088/1674-4527/ae9042},
+  eprint = {2606.25026},
+  archiveprefix = {arXiv},
+  primaryclass = {astro-ph.GA},
+  urldate = {2026-07-26}
+}
 ```
+
+Publications built on this code base:
+
+- **Meng, R. & Dong, X. 2026**, *Wave Cold Dark Matter Can Reproduce the Radial Acceleration Relation in X-ray Elliptical Galaxies*, Research in Astronomy and Astrophysics — [journal article](http://iopscience.iop.org/article/10.1088/1674-4527/aeac08) · [arXiv:2610.18969](https://arxiv.org/abs/2610.18969) · DOI [10.1088/1674-4527/aeac08](https://doi.org/10.1088/1674-4527/aeac08)
+
+```bibtex
+@article{meng2026wavecold,
+  title = {Wave {{Cold Dark Matter Can Reproduce}} the {{Radial Acceleration Relation}} in {{X}}-Ray {{Elliptical Galaxies}}},
+  author = {Meng, Runyu and Dong, Xiaobo},
+  year = 2026,
+  journal = {Research in Astronomy and Astrophysics},
+  issn = {1674-4527},
+  doi = {10.1088/1674-4527/aeac08},
+  url = {http://iopscience.iop.org/article/10.1088/1674-4527/aeac08},
+  eprint = {2610.18969},
+  archiveprefix = {arXiv},
+  primaryclass = {astro-ph.GA},
+  urldate = {2026-09-24}
+}
+```
+
+Methodological references for the gravity solvers are listed on the
+[CITING page](https://juliaastrosim.github.io/AstroNbodySim.jl/dev/citation/).
+BibTeX entries are also available in [`CITATION.bib`](CITATION.bib).
 
 ## FAQ
 

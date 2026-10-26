@@ -346,6 +346,13 @@ end
 ##### TimeConfig #####
 abstract type AbstractTimestepConfig{T} end
 
+"""
+    AdaptiveTimestep
+
+Adaptive timestep configuration. The raw step is
+`sqrt(2 * ErrTolTimestep * SofteningLength / |a|)`, quantised on an integer
+timeline of length `TimeBase` and bounded by `MinStep` and `MaxStep`.
+"""
 struct AdaptiveTimestep{T<:Number,F} <: AbstractTimestepConfig{T}
     MinStep::T
     MaxStep::T
@@ -367,6 +374,11 @@ function Base.show(io::IO, config::AdaptiveTimestep)
     )
 end
 
+"""
+    ConstantTimestep
+
+Constant timestep configuration with step `dt`. Selected when `TimeStep > 0`.
+"""
 struct ConstantTimestep{T<:Number} <: AbstractTimestepConfig{T}
     dt::T
 end

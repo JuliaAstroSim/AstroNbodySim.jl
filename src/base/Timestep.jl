@@ -47,6 +47,12 @@ function init_timesteps_local(sim::Simulation)
     sim.physics.NumForceUpdateSinceLast = 0
 end
 
+"""
+    init_timesteps(sim::Simulation)
+
+Initialise `Ti_endstep` for every particle from the current acceleration and
+softening length, using the configured constant or adaptive timestep.
+"""
 function init_timesteps(sim::Simulation, ::Gravity, ::CPU)
     bcast(sim, init_timesteps_local)
 end
@@ -105,6 +111,12 @@ function advance_and_find_timestep_local(sim::Simulation, GravSolver::Gravity, D
     advance_and_find_timestep_local(sim, get_local_data(sim), sim.config.time.step, GravSolver, Device)
 end
 
+"""
+    advance_and_find_timestep(sim::Simulation, solver, device)
+
+Apply the second half of the leapfrog kick and advance `Ti_endstep` to the
+next step for every active particle.
+"""
 function advance_and_find_timestep(sim::Simulation, GravSolver::Gravity, Device::CPU)
     bcast(sim, advance_and_find_timestep_local, args = (GravSolver, Device))
 end
@@ -203,6 +215,13 @@ function drift_particles_kernel(sim::Simulation, GravSolver::Gravity, Device::CP
     drift_particles_kernel(sim, get_local_data(sim), sim.config.time.step, GravSolver, Device)
 end
 
+"""
+    find_next_sync_point_and_drift(sim::Simulation, timestep_config, solver, device)
+
+Drift particles to the next synchronisation point and update the simulation
+time. The synchronisation point is determined by the constant or adaptive
+timestep configuration.
+"""
 function find_next_sync_point_and_drift(sim::Simulation, TimestepConfig::ConstantTimestep, GravSolver::Gravity, Device::DeviceType)
     next_system_time = sim.timeinfo.system_time_float + TimestepConfig.dt
 

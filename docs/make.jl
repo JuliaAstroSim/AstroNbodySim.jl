@@ -1,9 +1,12 @@
 """
+Init with:
+julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+
 Compile with:
 julia --project=docs/ --color=yes docs/make.jl
 
 Deployment is handled out-of-band by the `julia-actions/julia-docdeploy`
-GitHub Action (see `.github/workflows/Documentation.yml`).
+GitHub Action (see `.github/workflows/ManuallyBuildDoc.yml`).
 """
 
 using Documenter
