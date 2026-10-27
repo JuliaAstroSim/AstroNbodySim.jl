@@ -39,8 +39,9 @@ using IterativeSolvers
 # I/O
 using FileIO
 
-# Visualize
-using GLMakie
+# Visualize: GLMakie 已降为 weakdep + extension（见 ext/AstroNbodySimGLMakieExt.jl），
+# 实时可视化（Realtime=true）的实现在 extension 里，主包不加载 GLMakie。
+# 这样无头 CI 上 `import AstroNbodySim` 不会因为 GLFW 需要 X11 display 而预编译失败。
 
 # Parallel
 using LoopVectorization
